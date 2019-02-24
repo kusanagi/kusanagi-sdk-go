@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "VOB4XEixLU6hciPjkRyYu5xuYDM=",
+			"checksumSHA1": "J7xbS62kITEkRRD5qWc9A1A7x7g=",
 			"path": "github.com/pebbe/zmq4",
-			"revision": "651d7b11cd31b16fb4c76741c234e258b6a8039b",
-			"revisionTime": "2017-06-03T08:44:38Z"
+			"revision": "7a493a642e7acbd03045d4f5fe9516908a62f86f",
+			"revisionTime": "2019-01-13T09:08:35Z"
 		},
 		{
 			"checksumSHA1": "kdas0zQNtQqfUMEMFGkUF1OcgPc=",
