@@ -1,5 +1,5 @@
 // Go SDK for the KUSANAGI(tm) framework (http://kusanagi.io)
-// Copyright (c) 2016-2019 KUSANAGI S.L. All rights reserved.
+// Copyright (c) 2016-2020 KUSANAGI S.L. All rights reserved.
 //
 // Distributed under the MIT license.
 //
@@ -17,7 +17,7 @@ import (
 )
 
 // SDK version
-const version = "1.0.0"
+const version = "2.0.0"
 
 // Get the KUSANAGI SDK version.
 func Get() string {

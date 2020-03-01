@@ -8,7 +8,7 @@ Go SDK for the KUSANAGI framework
 Requirements
 ------------
 
-* [KUSANAGI framework](http://kusanagi.io) 1.0+
+* [KUSANAGI framework](http://kusanagi.io) 2.0+
 * [Go](https://golang.org/dl/) 1.8+
 * [libzmq](http://zeromq.org/intro:get-the-software) 4.1.5+
 
@@ -61,7 +61,7 @@ Please also be sure to review our [community guidelines](http://kusanagi.io/open
 License
 -------
 
-Copyright 2016-2019 KUSANAGI S.L. (http://kusanagi.io). All rights reserved.
+Copyright 2016-2020 KUSANAGI S.L. (http://kusanagi.io). All rights reserved.
 
 KUSANAGI, the sword logo and the "K" logo are trademarks and/or registered trademarks of KUSANAGI S.L. All other trademarks are property of their respective owners.
 
