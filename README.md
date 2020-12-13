@@ -9,22 +9,16 @@ Requirements
 ------------
 
 * [KUSANAGI framework](http://kusanagi.io) 2.0+
-* [Go](https://golang.org/dl/) 1.8+
+* [Go](https://golang.org/dl/) 1.14+
 * [libzmq](http://zeromq.org/intro:get-the-software) 4.1.5+
 
 Installation
 ------------
 
-To begin, first install the [govendor](https://github.com/kardianos/govendor) package:
+Install the SDK using the following command:
 
 ```
-$ go get -u github.com/kardianos/govendor
-```
-
-Then, install the SDK using the following command:
-
-```
-$ govendor get github.com/kusanagi/kusanagi-sdk-go
+$ go get github.com/kusanagi/kusanagi-sdk-go
 ```
 
 Getting Started
