@@ -108,7 +108,7 @@ func (a *Action) IsOrigin() bool {
 
 // GetActionName returns the name of the action.
 func (a *Action) GetActionName() string {
-	return a.state.getAction()
+	return a.state.action
 }
 
 // SetProperty sets a userland property in the transport.

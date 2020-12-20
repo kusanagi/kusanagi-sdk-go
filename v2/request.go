@@ -158,16 +158,13 @@ func (r *Request) NewParam(name string, value interface{}, type_ string) (*Param
 //
 // code: Optional status code.
 // text: Optional status text.
-func (r *Request) NewResponse(code int, text string) (*Response, error) {
-	rs, err := newResponse(r.component, r.state)
-	if err != nil {
-		return nil, err
-	}
+func (r *Request) NewResponse(code int, text string) *Response {
+	rs := newResponse(r.component, r.state)
 	rs.GetHTTPResponse().SetStatus(code, text)
 	// Change the reply payload from a request payload to a response payload.
 	// Initially the reply for the Request component is a RequestPayload.
 	r.reply.SetResponse(code, text)
-	return rs, nil
+	return rs
 }
 
 // GetHTTPRequest returns the HTTP request semantics for the current request.

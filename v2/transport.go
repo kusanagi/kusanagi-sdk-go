@@ -170,12 +170,12 @@ func (t Transport) GetTransactions(command string) ([]Transaction, error) {
 }
 
 // GetErrors returns the transport errors.
-func (t Transport) GetErrors() (errors []Error) {
+func (t Transport) GetErrors() (result []Error) {
 	for address, services := range *t.payload.Errors {
 		for service, versions := range services {
 			for version, errors := range versions {
 				for _, err := range errors {
-					errors = append(errors, Error{
+					result = append(result, Error{
 						address: address,
 						service: service,
 						version: version,
@@ -187,5 +187,5 @@ func (t Transport) GetErrors() (errors []Error) {
 			}
 		}
 	}
-	return errors
+	return result
 }

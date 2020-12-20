@@ -185,7 +185,7 @@ func (c *component) Run() bool {
 	// Run the server and check that all callbacks are run successfully
 	success := false
 	if c.events.startup(c) {
-		server, err := newServer(c.processor)
+		server, err := newServer(c, c.processor)
 		if err != nil {
 			log.Errorf("Component error: %v", err)
 		} else if err := server.start(); err != nil {
