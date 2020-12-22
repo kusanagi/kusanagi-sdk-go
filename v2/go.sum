@@ -1,3 +1,5 @@
+github.com/pebbe/zmq4 v1.0.1-0.20190113090835-7a493a642e7a h1:wivbIriEViU+LCCesidacqQrKh4SW274aqPtpw9hb5A=
+github.com/pebbe/zmq4 v1.0.1-0.20190113090835-7a493a642e7a/go.mod h1:7N4y5R18zBiu3l0vajMUWQgZyjv464prE8RCyBcmnZM=
 github.com/pebbe/zmq4 v1.2.1 h1:jrXQW3mD8Si2mcSY/8VBs2nNkK/sKCOEM0rHAfxyc8c=
 github.com/pebbe/zmq4 v1.2.1/go.mod h1:7N4y5R18zBiu3l0vajMUWQgZyjv464prE8RCyBcmnZM=
 github.com/ugorji/go v1.1.7 h1:/68gy2h+1mWMrwZFeD1kQialdSzAb432dtpeJ42ovdo=

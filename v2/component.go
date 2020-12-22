@@ -11,6 +11,7 @@ package kusanagi
 import (
 	"fmt"
 
+	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/cli"
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/log"
 )
 
