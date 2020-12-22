@@ -13,7 +13,11 @@ type ActionCallback func(*Action) (*Action, error)
 
 // NewService creates a new Service component.
 func NewService() *Service {
-	return &Service{newComponent(serviceRequestProcessor)}
+	service := &Service{}
+	service.component = newComponent(func(s *state, c chan<- requestOutput) {
+		serviceRequestProcessor(service, s, c)
+	})
+	return service
 }
 
 // Service component.

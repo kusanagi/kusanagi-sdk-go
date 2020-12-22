@@ -57,7 +57,7 @@ func Enable() {
 }
 
 // The level currently selected.
-var currentLevel = NOTSET
+var currentLevel = ERROR
 
 // SetLevel changes the current log level.
 func SetLevel(level int) {

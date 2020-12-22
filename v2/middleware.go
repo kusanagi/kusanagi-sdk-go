@@ -18,7 +18,11 @@ type ResponseCallback func(*Response) (*Response, error)
 
 // NewMiddleware creates a new Middleware component.
 func NewMiddleware() *Middleware {
-	return &Middleware{newComponent(middlewareRequestProcessor)}
+	middleware := &Middleware{}
+	middleware.component = newComponent(func(s *state, c chan<- requestOutput) {
+		middlewareRequestProcessor(middleware, s, c)
+	})
+	return middleware
 }
 
 // Middleware component.

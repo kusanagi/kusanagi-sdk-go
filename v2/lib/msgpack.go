@@ -33,5 +33,5 @@ func Unpack(data []byte, value interface{}) error {
 	handle.MapType = reflect.TypeOf(map[string]interface{}(nil))
 	handle.RawToString = true
 	decoder := codec.NewDecoderBytes(data, handle)
-	return decoder.Decode(&value)
+	return decoder.Decode(value)
 }

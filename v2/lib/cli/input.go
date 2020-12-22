@@ -108,7 +108,10 @@ func Parse() (Input, error) {
 	}
 
 	// Validate the option values when no help must be displayed
-	if !*help {
+	if *help {
+		PrintHelp(os.Stderr)
+		os.Exit(0)
+	} else {
 		if component == nil || *component == "" {
 			return input, newErrRequired("component")
 		} else if v := *component; v != "service" && v != "middleware" {

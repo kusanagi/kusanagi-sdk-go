@@ -35,6 +35,7 @@ type state struct {
 	input          cli.Input
 	context        context.Context
 	logger         log.RequestLogger
+	request        requestMsg
 }
 
 // Output for a request
@@ -45,17 +46,17 @@ type requestOutput struct {
 }
 
 // Request processor processes ZMQ request messages for a component.
-type requestProcessor func(Component, *state, chan<- requestOutput)
+type requestProcessor func(*state, chan<- requestOutput)
 
 // Create a response that contains an error as payload.
-func createErrorRespose(rid, message string) (responseMsg, error) {
+func createErrorResponse(message string) (responseMsg, error) {
 	p := payload.NewErrorReply()
 	p.Error.Message = message
 	data, err := lib.Pack(p)
 	if err != nil {
 		return nil, err
 	}
-	return responseMsg{[]byte(rid), emptyFrame, data}, nil
+	return responseMsg{emptyFrame, data}, nil
 
 }
 
@@ -73,16 +74,8 @@ func pipeOutput(c <-chan requestOutput) <-chan interface{} {
 }
 
 // Creates a new component server.
-func newServer(c Component, p requestProcessor) (*server, error) {
-	// Read CLI input values
-	input, err := cli.Parse()
-	if err != nil {
-		return nil, err
-	}
-
-	// Setup the log level before the server is created
-	log.SetLevel(input.GetLogLevel())
-	return &server{c, input, p}, nil
+func newServer(input cli.Input, c Component, p requestProcessor) *server {
+	return &server{c, input, p}
 }
 
 // SDK component server.
@@ -126,9 +119,9 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 
 		for {
 			// Block until a request message is received
-			msg, closed := <-msgc
+			msg, ok := <-msgc
 			// When the channel is closed finish the loop
-			if closed {
+			if !ok {
 				break
 			}
 
@@ -160,6 +153,7 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 					schemas: schemas,
 					input:   s.input,
 					logger:  logger,
+					request: msg,
 				}
 
 				// Prepare defaults for the request output
@@ -175,12 +169,17 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 
 				// Try to read the new schemas when present
 				if v := msg.getPayload(); v != nil {
-					if err := lib.Unpack(v, state.command); err != nil {
+					if err := lib.Unpack(v, &state.command); err != nil {
 						log.Criticalf("Failed to read payload: %v", err)
 						output.err = fmt.Errorf(`Invalid payload for component %s: "%s"`, title, action)
 						resc <- output
 						return
 					}
+				} else {
+					log.Critical("Empty command payload received")
+					output.err = fmt.Errorf(`Empty command payload for component %s: "%s"`, title, action)
+					resc <- output
+					return
 				}
 
 				// Create a child context with the process execution timeout as limit
@@ -193,7 +192,7 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 				defer close(outc)
 
 				// Process the request and return the response
-				go s.processor(s.component, &state, outc)
+				go s.processor(&state, outc)
 
 				// Block until the processor finishes or the execution timeout is triggered
 				select {
@@ -230,9 +229,10 @@ func (s *server) start() error {
 		} else {
 			log.Debug("Socket context terminated successfully")
 		}
-		// Clear the default ZMQ settings for retrying operations after EINTR.
-		zmq4.SetRetryAfterEINTR(false)
-		zctx.SetRetryAfterEINTR(false)
+		// TODO: Uncomment for ZMQ >= 1.2.1
+		// // Clear the default ZMQ settings for retrying operations after EINTR.
+		// zmq4.SetRetryAfterEINTR(false)
+		// zctx.SetRetryAfterEINTR(false)
 	}()
 
 	// Create a socket to receive incoming requests
@@ -296,7 +296,7 @@ func (s *server) start() error {
 		response := output.response
 		if output.err != nil {
 			// Create an error response
-			response, err = createErrorRespose(output.state.id, output.err.Error())
+			response, err = createErrorResponse(output.err.Error())
 			if err != nil {
 				// When the error response creation fails log the issue
 				// and stop processing the response.
@@ -306,7 +306,9 @@ func (s *server) start() error {
 			}
 		}
 
-		if _, err := socket.SendMessage(response); err != nil {
+		// Create the response message for the original request
+		msg := output.state.request.makeResponseMessage(response...)
+		if _, err := socket.SendMessage(msg); err != nil {
 			// When the context is terminated return the error to stop the reactor
 			if zmq4.AsErrno(err) == zmq4.ETERM {
 				return err

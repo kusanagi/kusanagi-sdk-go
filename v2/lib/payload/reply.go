@@ -158,5 +158,5 @@ type CallInfo struct {
 	Service string  `json:"s"`
 	Version string  `json:"v"`
 	Action  string  `json:"a"`
-	Params  []Param `json:"p"`
+	Params  []Param `json:"p,omitempty"`
 }

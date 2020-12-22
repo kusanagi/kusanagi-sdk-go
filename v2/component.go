@@ -182,13 +182,21 @@ func (c *component) Log(value interface{}, level int) Component {
 }
 
 func (c *component) Run() bool {
+	// Read CLI input values
+	input, err := cli.Parse()
+	if err != nil {
+		log.Errorf("Component error: %v", err)
+		return false
+	}
+
+	// Setup the log level before the server is created
+	log.SetLevel(input.GetLogLevel())
+
 	// Run the server and check that all callbacks are run successfully
 	success := false
 	if c.events.startup(c) {
-		server, err := newServer(c, c.processor)
-		if err != nil {
-			log.Errorf("Component error: %v", err)
-		} else if err := server.start(); err != nil {
+		server := newServer(input, c, c.processor)
+		if err := server.start(); err != nil {
 			log.Errorf("Component error: %v", err)
 		} else {
 			success = true

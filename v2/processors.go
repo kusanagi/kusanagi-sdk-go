@@ -90,7 +90,7 @@ func middlewareRequestProcessor(c Component, state *state, out chan<- requestOut
 	if err != nil {
 		output.err = fmt.Errorf("Failed to serialize the response: %v", err)
 	} else {
-		output.response = responseMsg{[]byte(state.id), emptyFrame, message}
+		output.response = responseMsg{emptyFrame, message}
 	}
 
 	out <- output
@@ -155,7 +155,7 @@ func serviceRequestProcessor(c Component, state *state, out chan<- requestOutput
 	if err != nil {
 		output.err = fmt.Errorf("Failed to serialize the response: %v", err)
 	} else {
-		output.response = responseMsg{[]byte(state.id), flags, message}
+		output.response = responseMsg{flags, message}
 	}
 
 	out <- output
