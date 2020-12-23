@@ -229,10 +229,9 @@ func (s *server) start() error {
 		} else {
 			log.Debug("Socket context terminated successfully")
 		}
-		// TODO: Uncomment for ZMQ >= 1.2.1
-		// // Clear the default ZMQ settings for retrying operations after EINTR.
-		// zmq4.SetRetryAfterEINTR(false)
-		// zctx.SetRetryAfterEINTR(false)
+		// Clear the default ZMQ settings for retrying operations after EINTR.
+		zmq4.SetRetryAfterEINTR(false)
+		zctx.SetRetryAfterEINTR(false)
 	}()
 
 	// Create a socket to receive incoming requests
