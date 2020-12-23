@@ -43,8 +43,10 @@ func newAction(c Component, s *state) *Action {
 	service := api.GetName()
 	version := api.GetVersion()
 	files := make(map[string]payload.File)
-	for _, f := range transport.Files.Get(gateway, service, version, s.action) {
-		files[f.Name] = f
+	if transport.Files != nil {
+		for _, f := range transport.Files.Get(gateway, service, version, s.action) {
+			files[f.Name] = f
+		}
 	}
 
 	// Index parameters by name

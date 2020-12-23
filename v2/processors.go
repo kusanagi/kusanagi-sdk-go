@@ -10,6 +10,7 @@ package kusanagi
 
 import (
 	"fmt"
+	"runtime/debug"
 
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib"
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/payload"
@@ -65,6 +66,14 @@ func executeRequestMiddleware(middleware *Middleware, state *state) interface{} 
 
 // Processor for middleware requests.
 func middlewareRequestProcessor(c Component, state *state, out chan<- requestOutput) {
+	defer func() {
+		// Handle panics gracefully
+		if err := recover(); err != nil {
+			state.logger.Criticalf("Panic: %v\n%s", err, debug.Stack())
+			out <- requestOutput{state: state, err: fmt.Errorf("Panic: %v", err)}
+		}
+	}()
+
 	var result interface{}
 
 	// Execute the userland callback
@@ -116,6 +125,14 @@ func handleServiceUserlandError(service *Service, state *state, err error) *Acti
 
 // Processor for service requests.
 func serviceRequestProcessor(c Component, state *state, out chan<- requestOutput) {
+	defer func() {
+		// Handle panics gracefully
+		if err := recover(); err != nil {
+			state.logger.Criticalf("Panic: %v\n%s", err, debug.Stack())
+			out <- requestOutput{state: state, err: fmt.Errorf("Panic: %v", err)}
+		}
+	}()
+
 	// Execute the userland callback
 	service := c.(*Service)
 	state.reply = payload.NewActionReply(&state.command)

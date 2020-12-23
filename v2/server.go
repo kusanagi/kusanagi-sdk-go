@@ -60,17 +60,59 @@ func createErrorResponse(message string) (responseMsg, error) {
 
 }
 
-// Cast the processor output results to interfaces.
-func pipeOutput(c <-chan requestOutput) <-chan interface{} {
-	pipe := make(chan interface{}, cap(c))
+// Pipe responses from a channel to a ZMQ internal socket
+func pipeOutput(zctx *zmq4.Context, c <-chan requestOutput) error {
+	errorc := make(chan error)
 
 	go func() {
+		// Create a socket to receive requests
+		socket, err := zctx.NewSocket(zmq4.PAIR)
+		if err != nil {
+			errorc <- fmt.Errorf("Failed to create internal socket: %v", err)
+		}
+		defer socket.Close()
+
+		// Connect to the internal request forwarder
+		if err := socket.Connect("inproc://responses"); err != nil {
+			if errno := zmq4.AsErrno(err); errno != zmq4.ETERM {
+				errorc <- fmt.Errorf("Failed to connect internal socket: %v", err)
+			}
+		}
+
+		// Close the socket after initialization
+		close(errorc)
+
+		// Start forwarding responses
 		for output := range c {
-			pipe <- output
+			logger := output.state.logger
+			response := output.response
+			if output.err != nil {
+				// Create an error response
+				response, err = createErrorResponse(output.err.Error())
+				if err != nil {
+					// When the error response creation fails log the issue
+					// and stop processing the response.
+					logger.Errorf("Request failed with error: %v", output.err)
+					logger.Errorf("Failed to create error response: %v", err)
+					continue
+				}
+			}
+
+			// Create the response message for the original request and send it to the forwarder
+			msg := output.state.request.makeResponseMessage(response...)
+			if _, err := socket.SendMessage([][]byte(msg)); err != nil {
+				if zmq4.AsErrno(err) == zmq4.ETERM {
+					break
+				} else {
+					log.Errorf("Failed to send internal response: %v", err)
+					continue
+				}
+			}
 		}
 	}()
 
-	return pipe
+	// Wait until pipe initialization finishes
+	return <-errorc
 }
 
 // Creates a new component server.
@@ -234,6 +276,24 @@ func (s *server) start() error {
 		zctx.SetRetryAfterEINTR(false)
 	}()
 
+	// Create a socket to receive responses from the workers
+	responses, err := zctx.NewSocket(zmq4.PAIR)
+	if err != nil {
+		return fmt.Errorf("Failed to create socket: %v", err)
+	}
+	defer responses.Close()
+
+	// Make sure sockets close after context is terminated
+	if err := responses.SetLinger(0); err != nil {
+		return fmt.Errorf("Failed to set socket's linger option: %v", err)
+	}
+
+	// Start listenin from worker responses
+	if err := responses.Bind("inproc://responses"); err != nil {
+		return fmt.Errorf("Faled to open internal socket: %v", err)
+	}
+	defer responses.Unbind("inproc://responses")
+
 	// Create a socket to receive incoming requests
 	socket, err := zctx.NewSocket(zmq4.ROUTER)
 	if err != nil {
@@ -264,60 +324,74 @@ func (s *server) start() error {
 	msgc := make(chan requestMsg, 1000)
 	// On exit close the channel to avoid worker creation
 	defer close(msgc)
+
 	// Define a channel to read the responses from the processors.
-	// Note: The output is piped to be able to use the channel in the ZMQ reactor.
-	resc := pipeOutput(s.startMessageListener(msgc))
+	// The output is piped to be able to use send channel responses to the ZMQ socket
+	if err := pipeOutput(zctx, s.startMessageListener(msgc)); err != nil {
+		return err
+	}
 
-	// Create a reactor to handle requests and worker responses.
-	// The reactor will handle as many responses as possible before reading incoming requests.
-	// Request are cached by ZMQ until the high water mark is reached.
-	// The reactor processes a handler at a time, so it is important that the socket and channel
-	// handlers finish as fast as possible.
-	reactor := zmq4.NewReactor()
-	reactor.AddSocket(socket, zmq4.POLLIN, func(zmq4.State) error {
-		// When a request is recieved read it and add it to the messages channel
-		// so the workers can process it.
-		msg, err := socket.RecvMessageBytes(0)
+	// Create a poller to read and write sockets
+	poller := zmq4.NewPoller()
+	poller.Add(socket, zmq4.POLLIN)
+	poller.Add(responses, zmq4.POLLIN)
+
+MAIN:
+	for {
+		polled, err := poller.Poll(-1)
 		if err != nil {
-			// When the context is terminated return the error to stop the reactor
-			if zmq4.AsErrno(err) == zmq4.ETERM {
-				return err
-			} else {
-				log.Errorf("Failed to read request payload: %v", err)
+			// ETERM means the context has been terminated.
+			// EINTR means a system interruption was triggered during a socket operation.
+			errno := zmq4.AsErrno(err)
+			if errno == zmq4.ETERM {
+				break MAIN
+			} else if errno != zmq4.Errno(syscall.EINTR) {
+				log.Errorf("Socket poll failed: %v", err)
 			}
-		}
-		msgc <- msg
-		return nil
-	})
-	reactor.AddChannel(resc, -1, func(v interface{}) error {
-		output := v.(requestOutput)
-		logger := output.state.logger
-		response := output.response
-		if output.err != nil {
-			// Create an error response
-			response, err = createErrorResponse(output.err.Error())
-			if err != nil {
-				// When the error response creation fails log the issue
-				// and stop processing the response.
-				logger.Errorf("Request failed with error: %v", output.err)
-				logger.Errorf("Failed to create error response: %v", err)
-				return nil
-			}
+			continue
 		}
 
-		// Create the response message for the original request
-		msg := output.state.request.makeResponseMessage(response...)
-		if _, err := socket.SendMessage(msg); err != nil {
-			// When the context is terminated return the error to stop the reactor
-			if zmq4.AsErrno(err) == zmq4.ETERM {
-				return err
-			} else {
-				logger.Errorf("Failed to send response to client: %v", err)
+		for _, p := range polled {
+			switch p.Socket {
+			case socket:
+				// Read the client request
+				msg, err := socket.RecvMessageBytes(0)
+				if err != nil {
+					// When the context is terminated return the error to stop the reactor
+					if zmq4.AsErrno(err) == zmq4.ETERM {
+						break MAIN
+					} else {
+						log.Errorf("Failed to read request: %v", err)
+						continue
+					}
+				}
+				// Send the request to be processed by the workers
+				msgc <- msg
+			case responses:
+				// Read the response from the internal socket
+				msg, err := responses.RecvMessageBytes(0)
+				if err != nil {
+					if zmq4.AsErrno(err) == zmq4.ETERM {
+						break MAIN
+					} else {
+						log.Errorf("Failed to read internal response: %v", err)
+						continue
+					}
+				}
+
+				// Write response to the client
+				if _, err := socket.SendMessage(msg); err != nil {
+					if zmq4.AsErrno(err) == zmq4.ETERM {
+						break MAIN
+					} else {
+						log.Errorf("Failed to send response to client: %v", err)
+						continue
+					}
+				}
 			}
 		}
-		return nil
-	})
-	reactor.Run(time.Second)
+	}
+
 	log.Info("Component stopped")
 	return nil
 }

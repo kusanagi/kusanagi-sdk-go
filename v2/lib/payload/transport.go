@@ -579,7 +579,7 @@ type TransportMeta struct {
 	Origin     []string          `json:"o"`
 	Level      uint              `json:"l"`
 	Properties map[string]string `json:"p,omitempty"`
-	Fallbacks  []Fallback        `json:"F,ommitempty"`
+	Fallbacks  []Fallback        `json:"F,omitempty"`
 }
 
 func (t *TransportMeta) merge(meta TransportMeta) {

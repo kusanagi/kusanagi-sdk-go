@@ -52,7 +52,10 @@ func (m requestMsg) getAction() string {
 
 // Get the mapping schemas stream.
 func (m requestMsg) getSchemas() []byte {
-	return m[msgSchemasPart]
+	if v := m[msgSchemasPart]; len(v) > 0 {
+		return v
+	}
+	return nil
 }
 
 // Get the command payload stream.

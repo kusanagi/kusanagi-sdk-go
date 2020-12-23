@@ -33,3 +33,10 @@ func Deserialize(data string) (value interface{}, err error) {
 	}
 	return value, nil
 }
+
+// Dump serializes a value to a pretty JSON string.
+// An empty string is returned when serialization fails.
+func Dump(value interface{}) string {
+	v, _ := Serialize(value, true)
+	return v
+}
