@@ -248,6 +248,11 @@ func (r *HTTPResponse) SetHeader(name, value string, overwrite bool) *HTTPRespon
 		}
 	}
 
+	// Initialize the headers map if it is empty
+	if r.payload.Headers == nil {
+		r.payload.Headers = make(map[string][]string)
+	}
+
 	// When a similar header exists replace the old header name with the new name
 	// and add the new value. This can happen when the header name casing is different.
 	if originalName != "" && originalName != name {
