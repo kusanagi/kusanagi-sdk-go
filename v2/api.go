@@ -140,8 +140,8 @@ func (a *Api) Log(value interface{}, level int) (*Api, error) {
 	return a, nil
 }
 
-// GetAsyncContext return the context for the current request.
-func (a *Api) GetAsyncContext() context.Context {
+// GetContext return the context for the current request.
+func (a *Api) GetContext() context.Context {
 	return a.state.context
 }
 
