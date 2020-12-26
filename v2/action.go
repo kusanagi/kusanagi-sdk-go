@@ -11,6 +11,7 @@ package kusanagi
 import (
 	"errors"
 	"fmt"
+	"reflect"
 
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/datatypes"
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/payload"
@@ -133,7 +134,7 @@ func (a *Action) HasParam(name string) bool {
 // GetParam returns an action parameter.
 //
 // name: The name of the parameter.
-func (a *Action) GetParam(name string) Param {
+func (a *Action) GetParam(name string) *Param {
 	if p, exists := a.params[name]; exists {
 		return payloadToParam(p)
 	}
@@ -259,22 +260,42 @@ func (a *Action) SetReturn(value interface{}) (*Action, error) {
 //
 // Sets an object as the entity to be returned by the action.
 //
+// The entity can only be a struct or a map.
+//
 // Entity is validated when validation is enabled for an entity in the service config file.
 //
 // entity: The entity.
-func (a *Action) SetEntity(entity map[string]interface{}) *Action {
+func (a *Action) SetEntity(entity interface{}) (*Action, error) {
+	// Check that the entity type is valid
+	t := reflect.TypeOf(entity)
+	if k := t.Kind(); k != reflect.Struct && k != reflect.Map {
+		return nil, fmt.Errorf("Entity type must be struct or map, got %s", k)
+	}
+
+	// Add the entity to the transport
 	a.transport.SetData(a.GetName(), a.GetVersion(), a.GetActionName(), entity)
-	return a
+	return a, nil
 }
 
 // SetCollection sets the collection data.
 //
+// The collection can only be a slice that contains either struct or a map types.
+//
 // Collection is validated when validation is enabled for an entity in the service config file.
 //
 // collection: The collection.
-func (a *Action) SetCollection(collection []map[string]interface{}) *Action {
+func (a *Action) SetCollection(collection interface{}) (*Action, error) {
+	// Check that the collection and item types are valid
+	t := reflect.TypeOf(collection)
+	if k := t.Kind(); k != reflect.Slice {
+		return nil, fmt.Errorf("Collections must be of type slice, got %s", k)
+	} else if k := t.Elem().Kind(); k != reflect.Struct && k != reflect.Map {
+		return nil, fmt.Errorf("Collections must contain struct or map types, got %s", k)
+	}
+
+	// Add the collection to the transport
 	a.transport.SetData(a.GetName(), a.GetVersion(), a.GetActionName(), collection)
-	return a
+	return a, nil
 }
 
 // RelateOne creates a "one-to-one" relation between entities.
