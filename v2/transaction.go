@@ -22,7 +22,7 @@ type Transaction struct {
 	version string
 	action  string
 	caller  string
-	params  []Param
+	params  []*Param
 }
 
 // GetType returns the transaction command type.
@@ -51,7 +51,7 @@ func (t Transaction) GetCalleeAction() string {
 }
 
 // GetParams gets the transaction parameters.
-func (t Transaction) GetParams() (params []Param) {
+func (t Transaction) GetParams() (params []*Param) {
 	// Add the parameters to a new list
 	for _, p := range t.params {
 		params = append(params, p)

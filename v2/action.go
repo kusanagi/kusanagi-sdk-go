@@ -138,11 +138,11 @@ func (a *Action) GetParam(name string) *Param {
 	if p, exists := a.params[name]; exists {
 		return payloadToParam(p)
 	}
-	return *newEmptyParam(name)
+	return newEmptyParam(name)
 }
 
 // GetParams returns all the action's parameters.
-func (a *Action) GetParams() (params []Param) {
+func (a *Action) GetParams() (params []*Param) {
 	for _, p := range a.params {
 		params = append(params, payloadToParam(p))
 	}
@@ -407,7 +407,7 @@ func (a *Action) SetLink(link, uri string) (*Action, error) {
 //
 // action: The action name.
 // params: Optional list of parameters.
-func (a *Action) Commit(action string, params []Param) (*Action, error) {
+func (a *Action) Commit(action string, params []*Param) (*Action, error) {
 	if action == "" {
 		return nil, fmt.Errorf("The action name is empty")
 	}
@@ -427,7 +427,7 @@ func (a *Action) Commit(action string, params []Param) (*Action, error) {
 //
 // action: The action name.
 // params: Optional list of parameters.
-func (a *Action) Rollback(action string, params []Param) (*Action, error) {
+func (a *Action) Rollback(action string, params []*Param) (*Action, error) {
 	if action == "" {
 		return nil, fmt.Errorf("The action name is empty")
 	}
@@ -447,7 +447,7 @@ func (a *Action) Rollback(action string, params []Param) (*Action, error) {
 //
 // action: The action name.
 // params: Optional list of parameters.
-func (a *Action) Complete(action string, params []Param) (*Action, error) {
+func (a *Action) Complete(action string, params []*Param) (*Action, error) {
 	if action == "" {
 		return nil, fmt.Errorf("The action name is empty")
 	}
@@ -477,7 +477,7 @@ func (a *Action) Call(
 	service string,
 	version string,
 	action string,
-	params []Param,
+	params []*Param,
 	files []File,
 	timeout uint,
 ) (interface{}, error) {
@@ -492,7 +492,7 @@ func (a *Action) Call(
 // action: The action name.
 // params: Optional list of parameters.
 // files: Optional list of files.
-func (a *Action) DeferCall(service, version, action string, params []Param, files []File) (*Action, error) {
+func (a *Action) DeferCall(service, version, action string, params []*Param, files []File) (*Action, error) {
 	// Check that the deferred call exists in the config
 	schema, err := a.GetServiceSchema(a.GetName(), a.GetVersion())
 	if err != nil {
@@ -550,7 +550,7 @@ func (a *Action) RemoteCall(
 	service string,
 	version string,
 	action string,
-	params []Param,
+	params []*Param,
 	files []File,
 	timeout uint,
 ) (*Action, error) {

@@ -139,7 +139,7 @@ func (p *Param) CopyWithType(type_ string) (*Param, error) {
 }
 
 // Converts a param to a param payload.
-func paramToPayload(p Param) payload.Param {
+func paramToPayload(p *Param) payload.Param {
 	return payload.Param{
 		Name:  p.GetName(),
 		Value: p.GetValue(),
@@ -148,8 +148,8 @@ func paramToPayload(p Param) payload.Param {
 }
 
 // Converts a param payload to a param.
-func payloadToParam(p payload.Param) Param {
-	return Param{
+func payloadToParam(p payload.Param) *Param {
+	return &Param{
 		name:   p.Name,
 		value:  p.Value,
 		type_:  p.Type,
@@ -158,7 +158,7 @@ func payloadToParam(p payload.Param) Param {
 }
 
 // Converts a list params to a list of param payloads.
-func paramsToPayload(ps []Param) (params []payload.Param) {
+func paramsToPayload(ps []*Param) (params []payload.Param) {
 	for _, p := range ps {
 		params = append(params, paramToPayload(p))
 	}
@@ -166,7 +166,7 @@ func paramsToPayload(ps []Param) (params []payload.Param) {
 }
 
 // Converts a list param payloads to a list of params.
-func payloadToParams(ps []payload.Param) (params []Param) {
+func payloadToParams(ps []payload.Param) (params []*Param) {
 	for _, p := range ps {
 		params = append(params, payloadToParam(p))
 	}

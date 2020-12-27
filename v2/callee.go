@@ -16,7 +16,7 @@ type Callee struct {
 	action   string
 	duration uint
 	timeout  uint
-	params   []Param
+	params   []*Param
 }
 
 // GetDuration returns the duration of the call in milliseconds.
@@ -55,7 +55,7 @@ func (c Callee) GetAction() string {
 }
 
 // GetParams returns the call parameters.
-func (c Callee) GetParams() (params []Param) {
+func (c Callee) GetParams() (params []*Param) {
 	// Add the parameters to a new list
 	for _, p := range c.params {
 		params = append(params, p)

@@ -116,15 +116,15 @@ func (r *Request) HasParam(name string) bool {
 // GetParam returns a request parameter.
 //
 // name: The name of the parameter.
-func (r *Request) GetParam(name string) Param {
+func (r *Request) GetParam(name string) *Param {
 	if p, exists := r.params[name]; exists {
 		return payloadToParam(p)
 	}
-	return *newEmptyParam(name)
+	return newEmptyParam(name)
 }
 
 // GetParams returns all the request's parameters.
-func (r *Request) GetParams() (params []Param) {
+func (r *Request) GetParams() (params []*Param) {
 	for _, p := range r.params {
 		params = append(params, payloadToParam(p))
 	}
@@ -134,7 +134,7 @@ func (r *Request) GetParams() (params []Param) {
 // SetParam adds a new param for the current request.
 //
 // param: The parameter.
-func (r *Request) SetParam(p Param) *Request {
+func (r *Request) SetParam(p *Param) *Request {
 	payload := paramToPayload(p)
 	r.params[p.GetName()] = payload
 	r.reply.Command.Result.Call.Params = append(r.reply.Command.Result.Call.Params, payload)
