@@ -89,6 +89,10 @@ func (t Transport) GetDownload() (f *File) {
 
 // GetData returns the transport data.
 func (t Transport) GetData() (data []ServiceData) {
+	if t.payload.Data == nil {
+		return nil
+	}
+
 	for address, services := range *t.payload.Data {
 		for service, versions := range services {
 			for version, actions := range versions {
