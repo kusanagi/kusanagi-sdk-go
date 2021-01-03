@@ -73,7 +73,7 @@ func (s ServiceSchema) GetActionSchema(name string) (*ActionSchema, error) {
 	if schema, ok := s.payload.Actions[name]; ok {
 		return &ActionSchema{name, schema}, nil
 	}
-	return nil, fmt.Errorf("Cannot resolve schema for action: %s", name)
+	return nil, fmt.Errorf(`Cannot resolve schema for "%s" (%s) action: %s`, s.GetName(), s.GetVersion(), name)
 }
 
 // GetHTTPSchema returns the HTTP schema.
