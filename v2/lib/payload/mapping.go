@@ -51,7 +51,7 @@ func (m Mapping) GetSchema(name, version string) (*Schema, error) {
 		// highest version from the ones registered in the mapping for the current service.
 		if !exists {
 			if resolved := semver.New(version).Resolve(m.GetVersions(name)); resolved != "" {
-				version = resolved
+				schema = versions[resolved]
 				exists = true
 			}
 		}

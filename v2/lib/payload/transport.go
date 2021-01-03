@@ -560,7 +560,7 @@ func (t *Transport) HasCalls(service, version string) bool {
 	for _, call := range t.Calls.get(service, version) {
 		// When duration is zero it means the call was not executed
 		// so is safe to assume a call that has to be executed was found.
-		if call.Duration > 0 {
+		if call.Duration == 0 {
 			return true
 		}
 	}
