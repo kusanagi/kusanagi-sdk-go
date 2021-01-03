@@ -48,12 +48,12 @@ func (c Command) GetRequestID() string {
 
 // GetAttributes returns the command attributes.
 func (c Command) GetAttributes() map[string]string {
-	return c.Command.Arguments.Attributes
+	return c.Command.Arguments.GetAttributes()
 }
 
 // GetCall returns the information of the service to contact.
 func (c Command) GetCall() *CallInfo {
-	return c.Command.Arguments.Call
+	return c.Command.Arguments.GetCall()
 }
 
 // GetTransport returns the transport payload.
@@ -72,21 +72,63 @@ type CommandInfo struct {
 	Arguments *CommandArguments `json:"a,omitempty"`
 }
 
-// ActionParams contains all the parameters sent to the action.
+// ActionParams contains all the parameters sent to an action during a runtime call.
 type ActionParams []Param
 
+// ActionFiles contains all the files sent to an action during a runtime call.
+type ActionFiles []File
+
 // CommandArguments contains the arguments of the command.
+// TODO: The specs need to fix the name clashes for "c" and "a" in the arguments.
 type CommandArguments struct {
-	// NOTE: Attributes must also exist here according to the specs
-	Attributes map[string]string `json:"a,omitempty"`
+	// NOTE: "A" might contain the action name (string) or attributes (map[string]string)
+	A interface{} `json:"a,omitempty"`
+
+	// NOTE: "C" might contain the callee ([]string) or call info (map[string]interface{})
+	C interface{} `json:"c,omitempty"`
 
 	Meta      Meta          `json:"m,omitempty"`
-	Call      *CallInfo     `json:"c,omitempty"`
 	Request   *HTTPRequest  `json:"r,omitempty"`
 	Response  *HTTPResponse `json:"R,omitempty"`
 	Transport *Transport    `json:"T,omitempty"`
-	Params    ActionParams  `json:"p,omitempty"` // TODO: The specs seems to be wrong here
+	Params    ActionParams  `json:"p,omitempty"` // TODO: The specs seem to be wrong here
+	Files     ActionFiles   `json:"f,omitempty"`
 	Return    interface{}   `json:"rv,omitempty"`
+}
+
+func (a *CommandArguments) GetCall() *CallInfo {
+	if data, ok := a.C.(map[string]interface{}); ok {
+		return mapToCallInfo(data)
+	}
+	return nil
+}
+
+func (a *CommandArguments) GetAttributes() map[string]string {
+	v, _ := a.A.(map[string]string)
+	return v
+}
+
+func (a *CommandArguments) GetAction() string {
+	v, _ := a.A.(string)
+	return v
+}
+
+func (a *CommandArguments) SetAction(name string) {
+	a.A = name
+}
+
+func (a *CommandArguments) GetCallee() (callee []string) {
+	if values, ok := a.C.([]interface{}); ok {
+		// Cast the values in the slice to string
+		for _, v := range values {
+			callee = append(callee, v.(string))
+		}
+	}
+	return callee
+}
+
+func (a *CommandArguments) SetCallee(callee []string) {
+	a.C = callee
 }
 
 // CommandMeta contains the meta-data associated with the command.

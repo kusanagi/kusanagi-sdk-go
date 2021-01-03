@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/datatypes"
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/payload"
@@ -480,9 +481,93 @@ func (a *Action) Call(
 	params []*Param,
 	files []File,
 	timeout uint,
-) (interface{}, error) {
-	// TODO: Implement run-time call
-	return nil, nil
+) (returnValue interface{}, err error) {
+	// Check that the call exists in the config
+	title := fmt.Sprintf(`"%s" (%s)`, service, version)
+	schema, err := a.GetServiceSchema(a.GetName(), a.GetVersion())
+	if err != nil {
+		return nil, err
+	}
+
+	actionSchema, err := schema.GetActionSchema(a.GetActionName())
+	if err != nil {
+		return nil, err
+	} else if !actionSchema.HasCall(service, version, action) {
+		return nil, fmt.Errorf(`Call not configured, connection to action on %s aborted: "%s"`, title, action)
+	}
+
+	// Check that the remote action exists and can return a value, and if it doesn't issue a warning
+	remoteSchema, err := a.GetServiceSchema(service, version)
+	if err != nil {
+		a.logger.Warning(err)
+	}
+
+	remoteActionSchema, err := remoteSchema.GetActionSchema(action)
+	if err != nil {
+		a.logger.Warning(err)
+	} else if remoteActionSchema.HasReturn() {
+		return nil, fmt.Errorf(`Cannot return value from %s for action: "%s"`, title, action)
+	}
+
+	// Check that the file server is enabled when one of the files is local
+	for _, file := range files {
+		if file.IsLocal() {
+			// Stop checking when one local file is found and the file server is enables
+			if schema.HasFileServer() {
+				break
+			}
+			return nil, fmt.Errorf("File server not configured: %s", title)
+		}
+	}
+
+	var transport *payload.Transport
+	var duration time.Duration
+
+	// Make sure the action's transport always contains the call info
+	// TODO: Check that duration and transport are set correctly after the runtime call
+	defer func() {
+		a.transport.SetCall(
+			a.GetName(),
+			a.GetVersion(),
+			a.GetActionName(),
+			service,
+			version,
+			action,
+			uint(duration*time.Millisecond),
+			paramsToPayload(params),
+			filesToPayload(files),
+			timeout,
+			transport,
+		)
+	}()
+
+	// Make the runtime call
+	callee := []string{service, version, action}
+	c, err := call(
+		a.GetContext(),
+		schema.GetAddress(),
+		a.GetActionName(),
+		callee,
+		a.command.GetTransport().Clone(),
+		params,
+		files,
+		a.input.IsTCPEnabled(),
+		timeout,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("Run-time call failed: %v", err)
+	}
+
+	// Wait for the runtime response
+	result := <-c
+	if err := result.Error; err != nil {
+		return nil, fmt.Errorf("Run-time call failed: %v", err)
+	}
+
+	// When the call suceeds update the transport and duration
+	duration = result.Duration
+	transport = result.Transport
+	return result.ReturnValue, nil
 }
 
 // DeferCall registera a deferred call to a service.

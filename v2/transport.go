@@ -171,6 +171,10 @@ func (t Transport) GetTransactions(command string) ([]Transaction, error) {
 
 // GetErrors returns the transport errors.
 func (t Transport) GetErrors() (result []Error) {
+	if t.payload.Errors == nil {
+		return nil
+	}
+
 	for address, services := range *t.payload.Errors {
 		for service, versions := range services {
 			for version, errors := range versions {

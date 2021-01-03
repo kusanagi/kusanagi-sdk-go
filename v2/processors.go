@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v2/lib"
+	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/msgpack"
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/payload"
 )
 
@@ -95,7 +95,7 @@ func middlewareRequestProcessor(c Component, state *state, out chan<- requestOut
 
 	// Serialize the payload
 	output := requestOutput{state: state}
-	message, err := lib.Pack(reply)
+	message, err := msgpack.Encode(reply)
 	if err != nil {
 		output.err = fmt.Errorf("Failed to serialize the response: %v", err)
 	} else {
@@ -168,7 +168,7 @@ func serviceRequestProcessor(c Component, state *state, out chan<- requestOutput
 
 	// Serialize the payload
 	output := requestOutput{state: state}
-	message, err := lib.Pack(state.reply)
+	message, err := msgpack.Encode(state.reply)
 	if err != nil {
 		output.err = fmt.Errorf("Failed to serialize the response: %v", err)
 	} else {

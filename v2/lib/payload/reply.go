@@ -97,6 +97,14 @@ func (r *Reply) GetTransport() *Transport {
 	return nil
 }
 
+// GetReturnValue returns the return value for the reply.
+func (r *Reply) GetReturnValue() interface{} {
+	if r.Command != nil {
+		return r.Command.Result.Return
+	}
+	return nil
+}
+
 // SetResponse sets a response in the payload.
 //
 // code: The HTTP status code for the response.
@@ -151,6 +159,28 @@ type CommandResult struct {
 	Response   *HTTPResponse     `json:"R,omitempty"`
 	Transport  *Transport        `json:"T,omitempty"`
 	Return     interface{}       `json:"rv,omitempty"`
+}
+
+// Create a new CallInfo from a map.
+// NOTE: This function is required because there is an issue with the command
+// payload where the same short name "c" is used for "call" info and "callee".
+func mapToCallInfo(data map[string]interface{}) *CallInfo {
+	c := &CallInfo{
+		Service: data["s"].(string),
+		Version: data["v"].(string),
+		Action:  data["a"].(string),
+	}
+	if params, ok := data["p"]; ok {
+		for _, v := range params.([]interface{}) {
+			p := v.(map[string]interface{})
+			c.Params = append(c.Params, Param{
+				Name:  p["n"].(string),
+				Value: p["v"],
+				Type:  p["t"].(string),
+			})
+		}
+	}
+	return c
 }
 
 // CallInfo contains the information of the service to contact.

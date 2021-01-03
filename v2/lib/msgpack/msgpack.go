@@ -6,7 +6,7 @@
 // For the full copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-package lib
+package msgpack
 
 import (
 	"bytes"
@@ -15,8 +15,8 @@ import (
 	"github.com/ugorji/go/codec"
 )
 
-// Pack serializes a value as a msgpack binary.
-func Pack(value interface{}) ([]byte, error) {
+// Encode serializes a value as a msgpack binary.
+func Encode(value interface{}) ([]byte, error) {
 	handle := new(codec.MsgpackHandle)
 	handle.WriteExt = true
 	buffer := new(bytes.Buffer)
@@ -27,8 +27,8 @@ func Pack(value interface{}) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-// Unpack a msgkpack binary value to its original type.
-func Unpack(data []byte, value interface{}) error {
+// Decode a msgkpack binary value to its original type.
+func Decode(data []byte, value interface{}) error {
 	handle := new(codec.MsgpackHandle)
 	handle.MapType = reflect.TypeOf(map[string]interface{}(nil))
 	handle.RawToString = true

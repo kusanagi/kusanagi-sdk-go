@@ -6,7 +6,7 @@
 // For the full copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-package lib
+package protocol
 
 import (
 	"fmt"
@@ -21,4 +21,14 @@ var ipcRegexp = regexp.MustCompile("[^a-zA-Z0-9]{1,}")
 func IPC(args ...string) string {
 	name := ipcRegexp.ReplaceAllString(strings.Join(args, "-"), "-")
 	return fmt.Sprintf("ipc://@kusanagi-%s", name)
+}
+
+// SocketAddress creates a ZMQ socket address.
+func SocketAddress(address string, tcp bool) string {
+	// Check if TCP must be used
+	if tcp {
+		return fmt.Sprintf("tcp://%s", address)
+	}
+	// Otherwise use IPC
+	return IPC(address)
 }

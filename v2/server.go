@@ -16,26 +16,26 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v2/lib"
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/cli"
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/log"
+	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/msgpack"
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/protocol"
 	"github.com/pebbe/zmq4"
 )
 
 // State contains the context data for a multipart request of the framework.
 type state struct {
-	id             string
-	componentTitle string
-	action         string
-	schemas        *payload.Mapping
-	command        payload.Command
-	reply          *payload.Reply
-	payload        []byte
-	input          cli.Input
-	context        context.Context
-	logger         log.RequestLogger
-	request        requestMsg
+	id      string
+	action  string
+	schemas *payload.Mapping
+	command payload.Command
+	reply   *payload.Reply
+	payload []byte
+	input   cli.Input
+	context context.Context
+	logger  log.RequestLogger
+	request requestMsg
 }
 
 // Output for a request
@@ -52,7 +52,7 @@ type requestProcessor func(*state, chan<- requestOutput)
 func createErrorResponse(message string) (responseMsg, error) {
 	p := payload.NewErrorReply()
 	p.Error.Message = message
-	data, err := lib.Pack(p)
+	data, err := msgpack.Encode(p)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (s *server) getAddress() (address string) {
 	} else {
 		// Create a default name for the socket when no name is available.
 		// The 'ipc://' prefix is removed from the string to get the socket name.
-		address = lib.IPC(s.input.GetComponent(), s.input.GetName(), s.input.GetVersion())
+		address = protocol.IPC(s.input.GetComponent(), s.input.GetName(), s.input.GetVersion())
 	}
 	return address
 }
@@ -176,7 +176,7 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 
 			// Try to read the new schemas when present
 			if v := msg.getSchemas(); v != nil {
-				if err := lib.Unpack(v, &schemas); err != nil {
+				if err := msgpack.Decode(v, &schemas); err != nil {
 					log.Errorf("Failed to read schemas: %v", err)
 				}
 			}
@@ -211,7 +211,7 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 
 				// Try to read the new schemas when present
 				if v := msg.getPayload(); v != nil {
-					if err := lib.Unpack(v, &state.command); err != nil {
+					if err := msgpack.Decode(v, &state.command); err != nil {
 						log.Criticalf("Failed to read payload: %v", err)
 						output.err = fmt.Errorf(`Invalid payload for component %s: "%s"`, title, action)
 						resc <- output
