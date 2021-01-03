@@ -520,6 +520,10 @@ func (a *Action) Call(
 		}
 	}
 
+	if timeout == 0 {
+		timeout = ExecutionTimeout
+	}
+
 	var transport *payload.Transport
 	var duration time.Duration
 
