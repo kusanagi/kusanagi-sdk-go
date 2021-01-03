@@ -27,14 +27,10 @@ func handleMiddlewareUserlandError(middleware *Middleware, state *state, err err
 	state.logger.Errorf("Callback error: %v", err)
 
 	// Call the userland error handler
-	body := err.Error()
-	if err := middleware.events.onError(err); err != nil {
-		// When the error handler fails use the result as the error
-		state.logger.Criticalf("Error callback failed: %v", err)
-		body = err.Error()
-	}
+	middleware.events.error(err)
 
 	// Create a new response with the error as body contents
+	body := err.Error()
 	response := newResponse(middleware, state)
 	httpResponse := response.GetHTTPResponse()
 	httpResponse.SetStatus(500, "Internal Server Error")
@@ -110,16 +106,11 @@ func handleServiceUserlandError(service *Service, state *state, err error) *Acti
 	state.logger.Errorf("Callback error: %v", err)
 
 	// Call the userland error handler
-	message := err.Error()
-	if err := service.events.onError(err); err != nil {
-		// When the error handler fails use the result as the error
-		state.logger.Criticalf("Error callback failed: %v", err)
-		message = err.Error()
-	}
+	service.events.error(err)
 
 	// Create a new action with an error
 	action := newAction(service, state)
-	action.Error(message, 500, "Internal Server Error")
+	action.Error(err.Error(), 500, "Internal Server Error")
 	return action
 }
 
