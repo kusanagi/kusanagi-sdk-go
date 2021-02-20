@@ -366,7 +366,7 @@ func (s ActionSchema) GetReturnType() (string, error) {
 
 // GetParams returns the parameter names defined for the action.
 func (s ActionSchema) GetParams() (params []string) {
-	for name, _ := range s.payload.Params {
+	for name := range s.payload.Params {
 		params = append(params, name)
 	}
 	return params
@@ -393,7 +393,7 @@ func (s ActionSchema) GetParamSchema(name string) (*ParamSchema, error) {
 
 // GetFiles returns the file parameter names defined for the action.
 func (s ActionSchema) GetFiles() (files []string) {
-	for name, _ := range s.payload.Files {
+	for name := range s.payload.Files {
 		files = append(files, name)
 	}
 	return files

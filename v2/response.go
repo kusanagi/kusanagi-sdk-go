@@ -241,7 +241,7 @@ func (r *HTTPResponse) SetHeader(name, value string, overwrite bool) *HTTPRespon
 	// If it exists get the original header name from the payload headers
 	uppercaseName := strings.ToUpper(name)
 	originalName := ""
-	for headerName, _ := range r.payload.Headers {
+	for headerName := range r.payload.Headers {
 		if strings.ToUpper(headerName) == uppercaseName {
 			originalName = headerName
 			break
