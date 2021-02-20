@@ -9,7 +9,7 @@ Requirements
 ------------
 
 * [KUSANAGI framework](http://kusanagi.io) 2.0+
-* [Go](https://golang.org/dl/) 1.14+
+* [Go](https://golang.org/dl/) 1.15+
 * [libzmq](http://zeromq.org/intro:get-the-software) 4.1.5+
 
 Installation
