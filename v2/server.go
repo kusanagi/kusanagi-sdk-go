@@ -1,5 +1,5 @@
 // Go SDK for the KUSANAGI(tm) framework (http://kusanagi.io)
-// Copyright (c) 2016-2020 KUSANAGI S.L. All rights reserved.
+// Copyright (c) 2016-2021 KUSANAGI S.L. All rights reserved.
 //
 // Distributed under the MIT license.
 //

@@ -55,7 +55,7 @@ Please also be sure to review our [community guidelines](http://kusanagi.io/open
 License
 -------
 
-Copyright 2016-2020 KUSANAGI S.L. (http://kusanagi.io). All rights reserved.
+Copyright 2016-2021 KUSANAGI S.L. (http://kusanagi.io). All rights reserved.
 
 KUSANAGI, the sword logo and the "K" logo are trademarks and/or registered trademarks of KUSANAGI S.L. All other trademarks are property of their respective owners.
 
