@@ -568,7 +568,7 @@ func (a *Action) Call(
 		return nil, fmt.Errorf("Run-time call failed: %v", err)
 	}
 
-	// When the call suceeds update the transport and duration
+	// When the call succeeds update the transport and duration
 	duration = result.Duration
 	transport = result.Transport
 	return result.ReturnValue, nil

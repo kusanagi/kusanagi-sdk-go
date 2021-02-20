@@ -64,11 +64,11 @@ func compareSubParts(sub1, sub2 string) bool {
 func zipVersionParts(items ...[]string) [][]string {
 	// Get length for each slice
 	maxLength := 0
-	lenghts := make([]int, len(items))
+	lengths := make([]int, len(items))
 	for i, item := range items {
-		lenghts[i] = len(item)
-		if lenghts[i] > maxLength {
-			maxLength = lenghts[i]
+		lengths[i] = len(item)
+		if lengths[i] > maxLength {
+			maxLength = lengths[i]
 		}
 	}
 
@@ -78,7 +78,7 @@ func zipVersionParts(items ...[]string) [][]string {
 		current := []string{}
 		// Iterate each of the slices once per slice for current index
 		for pos, item := range items {
-			if i < lenghts[pos] {
+			if i < lengths[pos] {
 				current = append(current, item[i])
 			} else {
 				// Add empty when no more elements are available in current slice
