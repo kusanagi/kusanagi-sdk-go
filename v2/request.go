@@ -149,9 +149,9 @@ func (r *Request) SetParam(p *Param) *Request {
 //
 // name: The parameter name.
 // value: The parameter value.
-// type_: The data type of the value.
-func (r *Request) NewParam(name string, value interface{}, type_ string) (*Param, error) {
-	return newParam(name, value, type_, true)
+// dataType: The data type of the value.
+func (r *Request) NewParam(name string, value interface{}, dataType string) (*Param, error) {
+	return newParam(name, value, dataType, true)
 }
 
 // NewResponse creates a new response.
@@ -196,7 +196,7 @@ func newHTTPRequest(p *payload.HTTPRequest) *HTTPRequest {
 	return &r
 }
 
-// HTTP request type.
+// HTTPRequest represents an HTTP request.
 type HTTPRequest struct {
 	payload *payload.HTTPRequest
 	headers map[string][]string

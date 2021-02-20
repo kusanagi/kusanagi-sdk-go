@@ -91,6 +91,7 @@ func (s Schema) GetFiles() bool {
 	return false
 }
 
+// HTTPSchema contains the HTTP schema definitions for a service.
 type HTTPSchema struct {
 	Gateway  *bool  `json:"g,omitempty"`
 	BasePath string `json:"b"`
@@ -138,7 +139,7 @@ type FallbackSchema struct {
 	Errors     []FallbackError    `json:"e,omitempty"`
 }
 
-// FallbackData contains the fallback data objects
+// FallbackObject contains the fallback data objects
 type FallbackObject map[string]FallbackValue
 
 // FallbackValue contains the value(s) and type of a fallback object.

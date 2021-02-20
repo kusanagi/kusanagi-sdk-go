@@ -66,7 +66,7 @@ func (c Command) GetResponse() *HTTPResponse {
 	return c.Command.Arguments.Response
 }
 
-// CommandMeta contains the semantics of the command.
+// CommandInfo contains the semantics of the command.
 type CommandInfo struct {
 	Name      string            `json:"n"`
 	Arguments *CommandArguments `json:"a,omitempty"`
@@ -96,6 +96,7 @@ type CommandArguments struct {
 	Return    interface{}   `json:"rv,omitempty"`
 }
 
+// GetCall returns the info for the call.
 func (a *CommandArguments) GetCall() *CallInfo {
 	if data, ok := a.C.(map[string]interface{}); ok {
 		return mapToCallInfo(data)
@@ -103,20 +104,24 @@ func (a *CommandArguments) GetCall() *CallInfo {
 	return nil
 }
 
+// GetAttributes returns the attributes for the command.
 func (a *CommandArguments) GetAttributes() map[string]string {
 	v, _ := a.A.(map[string]string)
 	return v
 }
 
+// GetAction returns the action name for the call.
 func (a *CommandArguments) GetAction() string {
 	v, _ := a.A.(string)
 	return v
 }
 
+// SetAction sets the name of the action for the call.
 func (a *CommandArguments) SetAction(name string) {
 	a.A = name
 }
 
+// GetCallee returns the callee service information.
 func (a *CommandArguments) GetCallee() (callee []string) {
 	if values, ok := a.C.([]interface{}); ok {
 		// Cast the values in the slice to string
@@ -127,6 +132,7 @@ func (a *CommandArguments) GetCallee() (callee []string) {
 	return callee
 }
 
+// SetCallee sets the calle service information.
 func (a *CommandArguments) SetCallee(callee []string) {
 	a.C = callee
 }

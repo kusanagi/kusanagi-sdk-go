@@ -8,6 +8,7 @@
 
 package payload
 
+// Param represents an action param.
 type Param struct {
 	Name  string      `json:"n"`
 	Value interface{} `json:"v,omitempty"`

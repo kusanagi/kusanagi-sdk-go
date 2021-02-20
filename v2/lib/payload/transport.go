@@ -10,9 +10,13 @@ package payload
 
 import "errors"
 
-// Transaction types
+// TransactionCommit defines the command type for commit transactions.
 const TransactionCommit = "commit"
+
+// TransactionRollback defines the command type for rollback transactions.
 const TransactionRollback = "rollback"
+
+// TransactionComplete defines the command type for complete transactions.
 const TransactionComplete = "complete"
 
 // Get the key to use in the transport payload for different transaction commands.
@@ -613,7 +617,7 @@ func (f Fallback) GetName() string {
 	return name
 }
 
-// GetName returns the service version.
+// GetVersion returns the service version.
 func (f Fallback) GetVersion() string {
 	if len(f) < 2 {
 		return ""
@@ -916,6 +920,7 @@ func (l Links) merge(source Links) {
 // Transactions contains the transport transactions.
 type Transactions map[string][]Transaction
 
+// Get the transactions for a comman type.
 func (t Transactions) Get(command string) (trx []Transaction) {
 	if key := transactionKey(command); key != "" {
 		trx = t[key]

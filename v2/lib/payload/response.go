@@ -10,9 +10,13 @@ package payload
 
 import "net/http"
 
-// Default HTTP response values
+// HTTPResponseVersion defines the default HTTP version to use for responses.
 const HTTPResponseVersion = "1.1"
+
+// HTTPResponseStatus defines the default HTTP status to use for responses.
 const HTTPResponseStatus = "200 OK"
+
+// HTTPResponseContentType defines the default HTTP content type to use for responses.
 const HTTPResponseContentType = "text/plain"
 
 // NewHTTPResponse creates a new HTTP response payload.

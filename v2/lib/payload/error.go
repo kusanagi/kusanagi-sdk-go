@@ -8,7 +8,10 @@
 
 package payload
 
+// DefaultErrorStatus contains the default status to use for errors.
 const DefaultErrorStatus = "500 Internal Server Error"
+
+// DefaultErrorMessage contains the default message to use for errors.
 const DefaultErrorMessage = "Unknown Error"
 
 // Error represents a reply that is returned when there is an error during command execution.
@@ -26,7 +29,7 @@ func (e Error) GetMessage() string {
 	return e.Message
 }
 
-// GetMessage returns the error message.
+// GetCode returns the error code.
 func (e Error) GetCode() int {
 	return e.Code
 }

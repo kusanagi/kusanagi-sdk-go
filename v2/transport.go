@@ -37,7 +37,7 @@ func (t Transport) GetOriginService() []string {
 	return t.payload.Meta.Origin
 }
 
-// GetDuration returns the service execution time in milliseconds.
+// GetOriginDuration returns the service execution time in milliseconds.
 //
 // This time is the number of milliseconds spent by the service that was the origin of the request.
 func (t Transport) GetOriginDuration() uint {

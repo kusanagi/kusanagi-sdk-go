@@ -8,14 +8,28 @@
 
 package payload
 
-// Types supported by the KUSANAGI framework
+// TypeNull defines the KUSANAGI type for null values.
 const TypeNull = "null"
+
+// TypeBoolean defines the KUSANAGI type for boolean values.
 const TypeBoolean = "boolean"
+
+// TypeInteger defines the KUSANAGI type for integer values.
 const TypeInteger = "integer"
+
+// TypeFloat defines the KUSANAGI type for float values.
 const TypeFloat = "float"
+
+// TypeString defines the KUSANAGI type for string values.
 const TypeString = "string"
+
+// TypeBinary defines the KUSANAGI type for binary values.
 const TypeBinary = "binary"
+
+// TypeArray defines the KUSANAGI type for array values.
 const TypeArray = "array"
+
+// TypeObject defines the KUSANAGI type for object values.
 const TypeObject = "object"
 
 var types = []string{

@@ -8,8 +8,10 @@
 
 package kusanagi
 
-// Types of relations between two services.
+// RelationTypeOne defines a one to one relation between two services.
 const RelationTypeOne = "one"
+
+// RelationTypeMany defines a one to many relation between two services.
 const RelationTypeMany = "many"
 
 // Relation represents a relation between two services.

@@ -14,29 +14,43 @@ import (
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/payload"
 )
 
-// Types supported by the KUSANAGI framework
+// Null defines the KUSANAGI data type for null values.
 const Null = payload.TypeNull
+
+// Boolean defines the KUSANAGI data type for boolean values.
 const Boolean = payload.TypeBoolean
+
+// Integer defines the KUSANAGI data type for integer values.
 const Integer = payload.TypeInteger
+
+// Float defines the KUSANAGI data type for float values.
 const Float = payload.TypeFloat
+
+// String defines the KUSANAGI data type for string values.
 const String = payload.TypeString
+
+// Binary defines the KUSANAGI data type for binary values.
 const Binary = payload.TypeBinary
+
+// Array defines the KUSANAGI data type for array values.
 const Array = payload.TypeArray
+
+// Object defines the KUSANAGI data type for object values.
 const Object = payload.TypeObject
 
-// Maximum size for an unsigned integer
+// MaxUint defines the maximum size for an unsigned integer>
 const MaxUint = ^uint(0)
 
-// Minimum size for an unsigned integer
+// MinUint defines the minimum size for an unsigned integer.
 const MinUint = 0
 
-// Maximum size for an integer
+// MaxInt defines the maximum size for an integer.
 const MaxInt = int(MaxUint >> 1)
 
-// Minimum size for an integer
+// MinInt defines the minimum size for an integer.
 const MinInt = -MaxInt - 1
 
-// Resolves the type for a Go native data type.
+// ResolveType resolves the type for a Go native data type.
 //
 // The resolved type is a KUSANAGI data type.
 //
@@ -49,22 +63,22 @@ func ResolveType(value interface{}) string {
 	}
 
 	// By default the type is string
-	type_ := String
+	valueType := String
 
 	kind := reflect.ValueOf(value).Kind()
 	switch {
 	case kind == reflect.String:
-		type_ = String
+		valueType = String
 	case kind == reflect.Bool:
-		type_ = Boolean
+		valueType = Boolean
 	case reflect.Int <= kind && kind <= reflect.Int64:
-		type_ = Integer
+		valueType = Integer
 	case kind == reflect.Float32 || kind == reflect.Float64:
-		type_ = Float
+		valueType = Float
 	case kind == reflect.Slice:
-		type_ = Array
+		valueType = Array
 	case kind == reflect.Map:
-		type_ = Object
+		valueType = Object
 	}
-	return type_
+	return valueType
 }

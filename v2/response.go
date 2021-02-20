@@ -107,7 +107,7 @@ func newHTTPResponse(p *payload.HTTPResponse) *HTTPResponse {
 	return &r
 }
 
-// HTTP response type.
+// HTTPResponse represent an http response.
 type HTTPResponse struct {
 	payload *payload.HTTPResponse
 	headers map[string][]string

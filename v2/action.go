@@ -158,9 +158,9 @@ func (a *Action) GetParams() (params []*Param) {
 //
 // name: The parameter name.
 // value: The parameter value.
-// type_: The data type of the value.
-func (a *Action) NewParam(name string, value interface{}, type_ string) (*Param, error) {
-	return newParam(name, value, type_, true)
+// dataType: The data type of the value.
+func (a *Action) NewParam(name string, value interface{}, dataType string) (*Param, error) {
+	return newParam(name, value, dataType, true)
 }
 
 // HasFile checks if a file was provided for the action.
@@ -218,7 +218,7 @@ func (a *Action) SetDownload(f File) (*Action, error) {
 	return a, nil
 }
 
-// SetReturns sets the value to be returned by the action.
+// SetReturn sets the value to be returned by the action.
 //
 // value: The action's return value.
 func (a *Action) SetReturn(value interface{}) (*Action, error) {

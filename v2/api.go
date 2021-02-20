@@ -54,55 +54,55 @@ func (a *Api) GetFrameworkVersion() string {
 	return a.input.GetFrameworkVersion()
 }
 
-// Get source file path.
+// GetPath returns the source file path.
 func (a *Api) GetPath() string {
 	return path.Dir(a.input.GetPath())
 }
 
-// Get component name.
+// GetName returns the component name.
 func (a *Api) GetName() string {
 	return a.input.GetName()
 }
 
-// Get component version.
+// GetVersion returns the component version.
 func (a *Api) GetVersion() string {
 	return a.input.GetVersion()
 }
 
-// Checks if a variable exists.
+// HasVariable checks if a variable exists.
 //
 // name: The name of the variable.
 func (a *Api) HasVariable(name string) bool {
 	return a.input.HasVariable(name)
 }
 
-// Gets all component variables.
+// GetVariables returns all component variables.
 func (a *Api) GetVariables() map[string]string {
 	return a.input.GetVariables()
 }
 
-// Get a single component variable.
+// GetVariable returns a single component variable.
 //
 // name: The name of the variable.
 func (a *Api) GetVariable(name string) string {
 	return a.input.GetVariable(name)
 }
 
-// Checks if a resource exists.
+// HasResource checks if a resource exists.
 //
 // name: The name of the resource.
 func (a *Api) HasResource(name string) bool {
 	return a.component.HasResource(name)
 }
 
-// Get a resource.
+// GetResource returns a resource.
 //
 // name: The name of the resource.
 func (a *Api) GetResource(name string) (interface{}, error) {
 	return a.component.GetResource(name)
 }
 
-// Get service names and versions from the mapping schemas.
+// GetServices return service names and versions from the mapping schemas.
 func (a *Api) GetServices() []payload.ServiceVersion {
 	return a.schemas.GetServices()
 }

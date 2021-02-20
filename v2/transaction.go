@@ -10,9 +10,13 @@ package kusanagi
 
 import "github.com/kusanagi/kusanagi-sdk-go/v2/lib/payload"
 
-// Transaction commands
+// Commit transaction command.
 const Commit = payload.TransactionCommit
+
+// Rollback transaction command.
 const Rollback = payload.TransactionRollback
+
+// Complete transaction command.
 const Complete = payload.TransactionComplete
 
 // Transaction represents a single transaction.
@@ -30,7 +34,7 @@ func (t Transaction) GetType() string {
 	return t.command
 }
 
-// GetVersion returns the name of the service that registered the transaction.
+// GetName returns the name of the service that registered the transaction.
 func (t Transaction) GetName() string {
 	return t.name
 }

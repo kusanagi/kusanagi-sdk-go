@@ -10,6 +10,7 @@ package payload
 
 import "net/http"
 
+// HTTPRequestData contains data sent in a request.
 type HTTPRequestData map[string][]string
 
 // HTTPRequest represents the semantics of an HTTP request.

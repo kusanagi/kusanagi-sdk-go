@@ -543,15 +543,20 @@ type ObjectField struct {
 	Optional bool
 }
 
-// List of array parameter formats
-//
-// Possible array formats are, "csv" for comma separated values, "ssv" for space separated
-// values, "tsv" for tab separated values, "pipes" for pipe separated values, or "multi" for
-// multiple parameter arguments instead of a single string argument containing all the values.
+// ArrayFormatCSV defines the array parameter format for comma separated values.
 const ArrayFormatCSV = "csv"
+
+// ArrayFormatSSV defines the array parameter format for space separated values.
 const ArrayFormatSSV = "ssv"
+
+// ArrayFormatTSV defines the array parameter format for tab separated values.
 const ArrayFormatTSV = "tsv"
+
+// ArrayFormatPipe defines the array parameter format for pipe ("|") separated values.
 const ArrayFormatPipe = "pipe"
+
+// ArrayFormatMulti defines the array format for multiple parameter arguments instead
+// of a single string argument containing all the values.
 const ArrayFormatMulti = "multi"
 
 // ParamSchema contains the schema definition of action parameters.
@@ -755,7 +760,7 @@ func (s FileSchema) GetMin() uint {
 	return s.payload.Min
 }
 
-// IsExclusiveMax checks if the minimum size is inclusive.
+// IsExclusiveMin checks if the minimum size is inclusive.
 func (s FileSchema) IsExclusiveMin() bool {
 	return s.payload.ExclusiveMin
 }
