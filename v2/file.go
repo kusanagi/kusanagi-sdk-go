@@ -21,6 +21,34 @@ import (
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/payload"
 )
 
+func checkLocalFileExist(path string) error {
+	// Remove the schema from the path
+	if path[:7] == "file://" {
+		path = path[7:]
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return fmt.Errorf(`file doesn't exist: "%s"`, path)
+	}
+	return nil
+}
+
+func extractLocalFileMimeType(path string) string {
+	mimeType := mime.TypeByExtension(filepath.Ext(path))
+	if mimeType != "" {
+		return mimeType
+	}
+	// Use a default mime type when it can't be guessed
+	return "text/plain"
+}
+
+func extractLocalFileSize(path string) uint {
+	if info, err := os.Stat(path[7:]); err == nil {
+		return uint(info.Size())
+	}
+	return 0
+}
+
 // NewFile creates a new file object.
 //
 // When the path is local it can start with "file://" or be a path to a local file,
@@ -49,20 +77,13 @@ func NewFile(name, path, mimeType, filename string, size uint, token string) (*F
 		}
 
 		// Check that the local file exists
-		localPath := path
-		if localPath[:7] == "file://" {
-			localPath = localPath[7:]
-		}
-		if _, err := os.Stat(localPath); os.IsNotExist(err) {
-			return nil, fmt.Errorf(`file doesn't exist: "%s"`, localPath)
+		if err := checkLocalFileExist(path); err != nil {
+			return nil, err
 		}
 
 		// When mime type is not given get it from the file path
 		if strings.TrimSpace(mimeType) == "" {
-			if mimeType = mime.TypeByExtension(filepath.Ext(path)); mimeType == "" {
-				// Set a default mime type when it can't be guessed
-				mimeType = "text/plain"
-			}
+			mimeType = extractLocalFileMimeType(path)
 		}
 
 		// When file name is not given get it from the last path element
@@ -72,9 +93,7 @@ func NewFile(name, path, mimeType, filename string, size uint, token string) (*F
 
 		// When file size is not given get it from the file but only when it is a local one
 		if size == 0 {
-			if info, err := os.Stat(path[7:]); err == nil {
-				size = uint(info.Size())
-			}
+			size = extractLocalFileSize(path)
 		}
 
 		if path[:7] != "file://" {
