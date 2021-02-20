@@ -32,6 +32,55 @@ func transactionKey(command string) string {
 	return ""
 }
 
+func mergeRuntimeCallTransportData(source, target *Transport) {
+	if target.Data == nil {
+		target.Data = &ServiceData{}
+	}
+	target.Data.merge(*source.Data)
+}
+
+func mergeRuntimeCallTransportRelations(source, target *Transport) {
+	if target.Relations == nil {
+		target.Relations = &Relations{}
+	}
+	target.Relations.merge(*source.Relations)
+}
+
+func mergeRuntimeCallTransportLinks(source, target *Transport) {
+	if target.Links == nil {
+		target.Links = &Links{}
+	}
+	target.Links.merge(*source.Links)
+}
+
+func mergeRuntimeCallTransportCalls(source, target *Transport) {
+	if target.Calls == nil {
+		target.Calls = &Calls{}
+	}
+	target.Calls.merge(*source.Calls)
+}
+
+func mergeRuntimeCallTransportTransactions(source, target *Transport) {
+	if target.Transactions == nil {
+		target.Transactions = &Transactions{}
+	}
+	target.Transactions.merge(*source.Transactions)
+}
+
+func mergeRuntimeCallTransportErrors(source, target *Transport) {
+	if target.Errors == nil {
+		target.Errors = &Errors{}
+	}
+	target.Errors.merge(*source.Errors)
+}
+
+func mergeRuntimeCallTransportFiles(source, target *Transport) {
+	if target.Files == nil {
+		target.Files = &Files{}
+	}
+	target.Files.merge(*source.Files)
+}
+
 // Merge a transport returned from a run-time call into another transport.
 //
 // source: The transport payload to merge.
@@ -40,56 +89,35 @@ func mergeRuntimeCallTransport(source, target *Transport) {
 	target.Meta.merge(source.Meta)
 
 	if source.Data != nil {
-		if target.Data == nil {
-			target.Data = &ServiceData{}
-		}
-		target.Data.merge(*source.Data)
+		mergeRuntimeCallTransportData(source, target)
 	}
 
 	if source.Relations != nil {
-		if target.Relations == nil {
-			target.Relations = &Relations{}
-		}
-		target.Relations.merge(*source.Relations)
+		mergeRuntimeCallTransportRelations(source, target)
 	}
 
 	if source.Links != nil {
-		if target.Links == nil {
-			target.Links = &Links{}
-		}
-		target.Links.merge(*source.Links)
+		mergeRuntimeCallTransportLinks(source, target)
 	}
 
 	if source.Calls != nil {
-		if target.Calls == nil {
-			target.Calls = &Calls{}
-		}
-		target.Calls.merge(*source.Calls)
+		mergeRuntimeCallTransportCalls(source, target)
 	}
 
 	if source.Transactions != nil {
-		if target.Transactions == nil {
-			target.Transactions = &Transactions{}
-		}
-		target.Transactions.merge(*source.Transactions)
+		mergeRuntimeCallTransportTransactions(source, target)
 	}
 
 	if source.Errors != nil {
-		if target.Errors == nil {
-			target.Errors = &Errors{}
-		}
-		target.Errors.merge(*source.Errors)
+		mergeRuntimeCallTransportErrors(source, target)
+	}
+
+	if source.Files != nil {
+		mergeRuntimeCallTransportFiles(source, target)
 	}
 
 	if source.Body == nil && target.Body != nil {
 		source.Body = target.Body
-	}
-
-	if source.Files != nil {
-		if target.Files == nil {
-			target.Files = &Files{}
-		}
-		target.Files.merge(*source.Files)
 	}
 }
 
