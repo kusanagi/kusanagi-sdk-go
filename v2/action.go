@@ -548,7 +548,7 @@ func (a *Action) Call(
 	// Make the runtime call
 	callee := []string{service, version, action}
 	c, err := call(
-		a.GetContext(),
+		a.Done(),
 		schema.GetAddress(),
 		a.GetActionName(),
 		callee,

@@ -9,7 +9,6 @@
 package kusanagi
 
 import (
-	"context"
 	"path"
 
 	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/cli"
@@ -140,12 +139,7 @@ func (a *Api) Log(value interface{}, level int) (*Api, error) {
 	return a, nil
 }
 
-// GetContext return the context for the current request.
-func (a *Api) GetContext() context.Context {
-	return a.state.context
-}
-
-// Done is a dummy method to comply with KUSANAGI SDK specifications.
-func (a *Api) Done() bool {
-	panic("SDK does not support async call to end action: Api.done()")
+// Done returns a channel that signals the deadline or cancellation of the call.
+func (a *Api) Done() <-chan struct{} {
+	return a.state.done
 }

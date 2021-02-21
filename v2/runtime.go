@@ -9,7 +9,6 @@
 package kusanagi
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -28,7 +27,7 @@ type callResult struct {
 }
 
 func call(
-	ctx context.Context,
+	stop <-chan struct{},
 	address string,
 	action string,
 	callee []string,
@@ -66,7 +65,7 @@ func call(
 		// NOTE: Run-time calls are made to the server address where the caller is runnning
 		//       and NOT directly to the service we wish to call. The KUSANAGI framework
 		//       takes care of the call logic for us to keep consistency between all the SDKs.
-		reply, duration, err := runtime.Call(ctx, protocol.SocketAddress(address, tcp), message, timeout)
+		reply, duration, err := runtime.Call(stop, protocol.SocketAddress(address, tcp), message, timeout)
 		if err != nil {
 			c <- callResult{Duration: duration, Error: err}
 		} else if err := reply.Error; err != nil {

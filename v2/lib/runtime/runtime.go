@@ -9,7 +9,6 @@
 package runtime
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -20,7 +19,7 @@ import (
 )
 
 // Call makes a runtime call to a service.
-func Call(ctx context.Context, address string, message []byte, timeout uint) (*payload.Reply, time.Duration, error) {
+func Call(stop <-chan struct{}, address string, message []byte, timeout uint) (*payload.Reply, time.Duration, error) {
 	var duration time.Duration
 
 	// Define a custom ZMQ context
@@ -36,7 +35,7 @@ func Call(ctx context.Context, address string, message []byte, timeout uint) (*p
 	// When the context is done terminate the ZMQ context to stop the runtime call
 	go func() {
 		select {
-		case <-ctx.Done():
+		case <-stop:
 			if err := zctx.Term(); err != nil {
 				log.Errorf("Failed to terminate runtime call context: %v", err)
 			}

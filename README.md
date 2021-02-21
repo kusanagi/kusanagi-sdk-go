@@ -26,6 +26,37 @@ Getting Started
 
 See the [getting started](http://kusanagi.io/docs/getting-started) tutorial to begin with the **KUSANAGI**™ framework and the **Go** SDK.
 
+### Cancellation Signal
+
+The Go SDK implements support to signal deadlines or cancellation through a read only channel that is available to **Middleware** and **Service** components.
+
+The channel can be read using the `Api.Done()` method. For example, within a service action:
+
+```go
+func handler(action *kusanagi.Action) (*kusanagi.Action, error) {
+    // Create a context for the current service call
+    ctx, cancel := context.WithCancel(context.Background())
+
+    // Create a channel to get the task result
+    result := make(chan int)
+
+    // Run some async task
+    go task(ctx, result)
+
+    // Cancel the context when the service call times out
+    select{
+    case v := <-result:
+       action.Log(v, 6)
+    case <-action.Done():
+        cancel()
+    }
+
+    return action, nil
+}
+```
+
+It is highly recommended to monitor this channel and stop any ongoing task when the channel is closed.
+
 Documentation
 -------------
 

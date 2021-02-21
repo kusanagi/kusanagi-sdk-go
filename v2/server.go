@@ -33,7 +33,7 @@ type state struct {
 	reply   *payload.Reply
 	payload []byte
 	input   cli.Input
-	context context.Context
+	done    chan struct{}
 	logger  log.RequestLogger
 	request requestMsg
 }
@@ -194,9 +194,11 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 					action:  action,
 					schemas: schemas,
 					input:   s.input,
+					done:    make(chan struct{}),
 					logger:  logger,
 					request: msg,
 				}
+				defer close(state.done)
 
 				// Prepare defaults for the request output
 				output := requestOutput{state: &state}
@@ -206,7 +208,6 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 					output.err = fmt.Errorf(`Invalid action for component %s: "%s"`, title, action)
 					resc <- output
 					return
-
 				}
 
 				// Try to read the new schemas when present
@@ -227,7 +228,6 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 				// Create a child context with the process execution timeout as limit
 				ctx, cancel := context.WithTimeout(ctx, timeout)
 				defer cancel()
-				state.context = ctx
 
 				// Create a channel to wait for the processor output
 				outc := make(chan requestOutput)
