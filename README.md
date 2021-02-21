@@ -18,7 +18,7 @@ Installation
 Install the SDK using the following command:
 
 ```
-$ go get github.com/kusanagi/kusanagi-sdk-go@latest
+$ go get github.com/kusanagi/kusanagi-sdk-go@epoch-2
 ```
 
 Getting Started
