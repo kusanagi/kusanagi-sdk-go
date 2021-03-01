@@ -15,7 +15,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/log"
+	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/log"
 )
 
 // Regexp to check for invalid chars in version patterns

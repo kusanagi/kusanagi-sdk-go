@@ -11,9 +11,9 @@ package kusanagi
 import (
 	"path"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/cli"
-	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/log"
-	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/cli"
+	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/log"
+	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/payload"
 )
 
 func newApi(c Component, s *state) *Api {

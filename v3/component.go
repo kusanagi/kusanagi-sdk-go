@@ -11,8 +11,8 @@ package kusanagi
 import (
 	"fmt"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/cli"
-	"github.com/kusanagi/kusanagi-sdk-go/v2/lib/log"
+	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/cli"
+	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/log"
 )
 
 // Component represents a KUSANAGI SDK generic component.

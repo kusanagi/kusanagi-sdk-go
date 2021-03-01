@@ -1,4 +1,4 @@
-module github.com/kusanagi/kusanagi-sdk-go/v2
+module github.com/kusanagi/kusanagi-sdk-go/v3
 
 go 1.15
 
