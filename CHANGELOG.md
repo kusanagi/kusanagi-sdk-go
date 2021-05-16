@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Server socket initialization issue during error checking
 
 ## [3.0.0] - 2021-03-01
 ### Changed

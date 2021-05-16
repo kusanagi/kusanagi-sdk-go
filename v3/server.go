@@ -69,6 +69,7 @@ func pipeOutput(zctx *zmq4.Context, c <-chan requestOutput) error {
 		socket, err := zctx.NewSocket(zmq4.PAIR)
 		if err != nil {
 			errorc <- fmt.Errorf("Failed to create internal socket: %v", err)
+			return
 		}
 		defer socket.Close()
 
@@ -77,6 +78,7 @@ func pipeOutput(zctx *zmq4.Context, c <-chan requestOutput) error {
 			if errno := zmq4.AsErrno(err); errno != zmq4.ETERM {
 				errorc <- fmt.Errorf("Failed to connect internal socket: %v", err)
 			}
+			return
 		}
 
 		// Close the socket after initialization
