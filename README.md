@@ -1,6 +1,7 @@
 Go SDK for the KUSANAGI framework
 =================================
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/kusanagi/kusanagi-sdk-go)](https://goreportcard.com/report/github.com/kusanagi/kusanagi-sdk-go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 **Go** SDK to interface with the **KUSANAGI**™ framework (http://kusanagi.io).
