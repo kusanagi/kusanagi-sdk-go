@@ -13,10 +13,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/msgpack"
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/payload"
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/protocol"
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/runtime"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/msgpack"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/protocol"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/runtime"
 )
 
 type callResult struct {

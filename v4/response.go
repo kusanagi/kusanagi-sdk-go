@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
 )
 
 func newResponse(c Component, s *state) *Response {

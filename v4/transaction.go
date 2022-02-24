@@ -8,7 +8,7 @@
 
 package kusanagi
 
-import "github.com/kusanagi/kusanagi-sdk-go/v3/lib/payload"
+import "github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
 
 // Commit transaction command.
 const Commit = payload.TransactionCommit

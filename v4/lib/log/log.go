@@ -18,7 +18,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/json"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/json"
 )
 
 // These flags define the error levels following RFC5425.

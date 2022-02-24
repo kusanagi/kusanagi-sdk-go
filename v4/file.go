@@ -18,7 +18,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
 )
 
 func checkLocalFileExist(path string) error {

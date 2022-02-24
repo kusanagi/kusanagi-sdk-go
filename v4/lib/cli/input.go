@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/log"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/log"
 )
 
 // List of CLI options.

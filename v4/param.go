@@ -11,8 +11,8 @@ package kusanagi
 import (
 	"fmt"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/datatypes"
-	"github.com/kusanagi/kusanagi-sdk-go/v3/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/datatypes"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
 )
 
 // Cast a value from one supported type to another
