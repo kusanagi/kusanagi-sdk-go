@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Change incoming socket HWM to avoid limiting the number of incoming requests
+
 ### Fixed
 - Server socket initialization issue during error checking
 

@@ -270,8 +270,6 @@ func (s *server) start() error {
 		// Terminate the ZMQ context to close sockets gracefully
 		if err := zctx.Term(); err != nil {
 			log.Errorf("Failed to terminate sockets context: %v", err)
-		} else {
-			log.Debug("Socket context terminated successfully")
 		}
 		// Clear the default ZMQ settings for retrying operations after EINTR.
 		zmq4.SetRetryAfterEINTR(false)
@@ -307,9 +305,9 @@ func (s *server) start() error {
 	if err := socket.SetLinger(0); err != nil {
 		return fmt.Errorf("Failed to set socket's linger option: %v", err)
 	}
-	// Set the maximum number of request that are cached by the socket.
+	// Change the socket HWM to allow caching any number of incoming request.
 	// ZMQ default value is 1000.
-	if err := socket.SetRcvhwm(1000); err != nil {
+	if err := socket.SetRcvhwm(0); err != nil {
 		return fmt.Errorf("Failed to set socket's high water mark option: %v", err)
 	}
 
