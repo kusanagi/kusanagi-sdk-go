@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Changed
 - Change incoming socket HWM to avoid limiting the number of incoming requests
+- CLI --socket option is now called --ipc
 
 ### Fixed
 - Server socket initialization issue during error checking

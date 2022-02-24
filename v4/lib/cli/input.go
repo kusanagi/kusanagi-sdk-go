@@ -35,6 +35,12 @@ var help = boolOption(
 	false,
 	false,
 )
+var socket = stringOption(
+	"i", "ipc",
+	"IPC socket name",
+	"",
+	false,
+)
 var logLevel = uintOption(
 	"L", "log-level",
 	"Enable logging using a numeric syslog severity value [0-7]",
@@ -52,12 +58,6 @@ var frameworkVersion = stringOption(
 	"KUSANAGI framework version",
 	"",
 	true,
-)
-var socket = stringOption(
-	"s", "socket",
-	"IPC socket name",
-	"",
-	false,
 )
 var tcp = uintOption(
 	"t", "tcp",
