@@ -549,7 +549,7 @@ func (a *Action) Call(
 	callee := []string{service, version, action}
 	c, err := call(
 		a.Done(),
-		schema.GetAddress(),
+		a.state.input.GetComponentAddress(),
 		a.GetActionName(),
 		callee,
 		a.command.GetTransport().Clone(),

@@ -17,6 +17,12 @@ import (
 )
 
 // List of CLI options.
+var address = stringOption(
+	"a", "address",
+	"Component addess as IP:PORT",
+	"",
+	true,
+)
 var component = stringOption(
 	"c", "component",
 	"Component type [service|middleware]",
@@ -116,6 +122,8 @@ func Parse() (Input, error) {
 			return input, newErrRequired("component")
 		} else if v := *component; v != "service" && v != "middleware" {
 			return input, newErrInvalid("component")
+		} else if address == nil || *address == "" {
+			return input, newErrRequired("address")
 		} else if name == nil || *name == "" {
 			return input, newErrRequired("name")
 		} else if frameworkVersion == nil || *frameworkVersion == "" {
@@ -201,6 +209,14 @@ func (i Input) GetTCP() uint {
 // IsTCPEnabled checks if TCP connections should be used instead of IPC.
 func (i Input) IsTCPEnabled() bool {
 	return i.GetTCP() != 0
+}
+
+// GetComponentAddress returns the local component address as 127.0.0.1:PORT.
+func (i Input) GetComponentAddress() string {
+	if address == nil {
+		return ""
+	}
+	return *address
 }
 
 // GetSocket returns the ZMQ socket name.

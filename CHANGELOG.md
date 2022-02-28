@@ -5,9 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Support for the component address CLI "--address" argument
+
 ### Changed
 - Change incoming socket HWM to avoid limiting the number of incoming requests
 - CLI --socket option is now called --ipc
+- Runtime calls now get the component address from the CLI arguments instead of the mappings
 
 ### Fixed
 - Server socket initialization issue during error checking
