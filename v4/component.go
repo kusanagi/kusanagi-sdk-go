@@ -192,14 +192,16 @@ func (c *component) Run() bool {
 	input, err := cli.Parse()
 	if err != nil {
 		log.Errorf("Component error: %v", err)
+
 		return false
 	}
 
 	// Setup the log level before the server is created
 	log.SetLevel(input.GetLogLevel())
 
-	// Run the server and check that all callbacks are run successfully
 	success := false
+
+	// Run the server and check that all callbacks are run successfully
 	if c.events.startup(c) {
 		server := newServer(input, c, c.processor)
 		if err := server.start(); err != nil {
@@ -213,5 +215,6 @@ func (c *component) Run() bool {
 	if c.events.shutdown(c) {
 		return success
 	}
+
 	return false
 }

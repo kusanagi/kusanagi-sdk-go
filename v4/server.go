@@ -33,7 +33,7 @@ type state struct {
 	reply   *payload.Reply
 	payload []byte
 	input   cli.Input
-	done    chan struct{}
+	ctx     context.Context
 	logger  log.RequestLogger
 	request requestMsg
 }
@@ -52,10 +52,12 @@ type requestProcessor func(*state, chan<- requestOutput)
 func createErrorResponse(message string) (responseMsg, error) {
 	p := payload.NewErrorReply()
 	p.Error.Message = message
+
 	data, err := msgpack.Encode(p)
 	if err != nil {
 		return nil, err
 	}
+
 	return responseMsg{emptyFrame, data}, nil
 
 }
@@ -69,8 +71,10 @@ func pipeOutput(zctx *zmq4.Context, c <-chan requestOutput) error {
 		socket, err := zctx.NewSocket(zmq4.PAIR)
 		if err != nil {
 			errorc <- fmt.Errorf("Failed to create internal socket: %v", err)
+
 			return
 		}
+
 		defer socket.Close()
 
 		// Connect to the internal request forwarder
@@ -78,6 +82,7 @@ func pipeOutput(zctx *zmq4.Context, c <-chan requestOutput) error {
 			if errno := zmq4.AsErrno(err); errno != zmq4.ETERM {
 				errorc <- fmt.Errorf("Failed to connect internal socket: %v", err)
 			}
+
 			return
 		}
 
@@ -88,6 +93,7 @@ func pipeOutput(zctx *zmq4.Context, c <-chan requestOutput) error {
 		for output := range c {
 			logger := output.state.logger
 			response := output.response
+
 			if output.err != nil {
 				// Create an error response
 				response, err = createErrorResponse(output.err.Error())
@@ -96,6 +102,7 @@ func pipeOutput(zctx *zmq4.Context, c <-chan requestOutput) error {
 					// and stop processing the response.
 					logger.Errorf("Request failed with error: %v", output.err)
 					logger.Errorf("Failed to create error response: %v", err)
+
 					continue
 				}
 			}
@@ -107,6 +114,7 @@ func pipeOutput(zctx *zmq4.Context, c <-chan requestOutput) error {
 					break
 				} else {
 					log.Errorf("Failed to send internal response: %v", err)
+
 					continue
 				}
 			}
@@ -140,38 +148,48 @@ func (s *server) getAddress() (address string) {
 		// The 'ipc://' prefix is removed from the string to get the socket name.
 		address = protocol.IPC(s.input.GetComponent(), s.input.GetName(), s.input.GetVersion())
 	}
+
 	return address
+}
+
+func (s *server) hasComponentCallback(name string) bool {
+	c := s.component.(*component)
+
+	return c.hasCallback(name)
 }
 
 func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutput {
 	// Create a buffered channel to receive the responses from the handlers
 	resc := make(chan requestOutput, 1000)
 
-	// Get the title to use for the component
-	title := s.input.GetComponentTitle()
-
 	// Handle messages until the messages channel is closed
 	go func() {
 		// TODO: See how to avoid race conditions when mapping are updated here (and read by userland)
 		var schemas *payload.Mapping
 
+		// Get the title to use for the component
+		title := s.input.GetComponentTitle()
+
 		// Process execution timeout
 		timeout := time.Duration(s.input.GetTimeout()) * time.Millisecond
 
 		// Define a parent context for each request
-		ctx := context.Background()
+		ctx, cancel := context.WithCancel(context.Background())
 
 		for {
 			// Block until a request message is received
 			msg, ok := <-msgc
-			// When the channel is closed finish the loop
 			if !ok {
+				cancel()
+
+				// When the channel is closed finish the loop
 				break
 			}
 
 			// Check that the multipart message is valid
 			if err := msg.check(); err != nil {
 				log.Critical(err)
+
 				// Log the error and continue listening for incoming requests
 				continue
 			}
@@ -186,6 +204,11 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 			// Process the request message in a new goroutine
 			// TODO: Move to a function
 			go func() {
+				// Create a child context with the process execution timeout as limit
+				ctx, cancel := context.WithTimeout(ctx, timeout)
+
+				defer cancel()
+
 				rid := msg.getRequestID()
 				action := msg.getAction()
 				logger := log.NewRequestLogger(rid)
@@ -196,19 +219,19 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 					action:  action,
 					schemas: schemas,
 					input:   s.input,
-					done:    make(chan struct{}),
+					ctx:     ctx,
 					logger:  logger,
 					request: msg,
 				}
-				defer close(state.done)
 
 				// Prepare defaults for the request output
 				output := requestOutput{state: &state}
 
 				// Check that the request action is defined
-				if c := s.component.(*component); !c.hasCallback(msg.getAction()) {
+				if !s.hasComponentCallback(msg.getAction()) {
 					output.err = fmt.Errorf(`Invalid action for component %s: "%s"`, title, action)
 					resc <- output
+
 					return
 				}
 
@@ -216,24 +239,23 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 				if v := msg.getPayload(); v != nil {
 					if err := msgpack.Decode(v, &state.command); err != nil {
 						log.Criticalf("Failed to read payload: %v", err)
+
 						output.err = fmt.Errorf(`Invalid payload for component %s: "%s"`, title, action)
 						resc <- output
+
 						return
 					}
 				} else {
 					log.Critical("Empty command payload received")
+
 					output.err = fmt.Errorf(`Empty command payload for component %s: "%s"`, title, action)
 					resc <- output
+
 					return
 				}
 
-				// Create a child context with the process execution timeout as limit
-				ctx, cancel := context.WithTimeout(ctx, timeout)
-				defer cancel()
-
 				// Create a channel to wait for the processor output
 				outc := make(chan requestOutput)
-				defer close(outc)
 
 				// Process the request and return the response
 				go s.processor(&state, outc)
@@ -243,7 +265,7 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 				case output := <-outc:
 					resc <- output
 				case <-ctx.Done():
-					logger.Warningf("Execution timed out after %dms. PID: %d", timeout, os.Getpid())
+					logger.Warningf("Execution timed out after %s. PID: %d", timeout, os.Getpid())
 				}
 			}()
 		}

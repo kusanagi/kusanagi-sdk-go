@@ -62,6 +62,8 @@ func executeRequestMiddleware(middleware *Middleware, state *state) interface{} 
 
 // Processor for middleware requests.
 func middlewareRequestProcessor(c Component, state *state, out chan<- requestOutput) {
+	defer close(out)
+
 	defer func() {
 		// Handle panics gracefully
 		if err := recover(); err != nil {
@@ -116,25 +118,31 @@ func handleServiceUserlandError(service *Service, state *state, err error) *Acti
 
 // Processor for service requests.
 func serviceRequestProcessor(c Component, state *state, out chan<- requestOutput) {
+	defer close(out)
+
 	defer func() {
 		// Handle panics gracefully
 		if err := recover(); err != nil {
 			state.logger.Criticalf("Panic: %v\n%s", err, debug.Stack())
+
 			out <- requestOutput{state: state, err: fmt.Errorf("Panic: %v", err)}
 		}
 	}()
 
 	// Execute the userland callback
 	service := c.(*Service)
-	state.reply = payload.NewActionReply(&state.command)
 	callback := service.callbacks[state.action].(ActionCallback)
+
+	state.reply = payload.NewActionReply(&state.command)
+
 	action, err := callback(newAction(service, state))
 	if err != nil {
 		action = handleServiceUserlandError(service, state, err)
 	}
 
-	// Inspect the transport to set the flags for the response
 	var flags []byte
+
+	// Inspect the transport to set the flags for the response
 	if t := state.reply.GetTransport(); t != nil {
 		if t.HasCalls(action.GetName(), action.GetVersion()) {
 			flags = append(flags, serviceCallFlag...)
@@ -157,8 +165,9 @@ func serviceRequestProcessor(c Component, state *state, out chan<- requestOutput
 		flags = emptyFrame
 	}
 
-	// Serialize the payload
 	output := requestOutput{state: state}
+
+	// Serialize the payload
 	message, err := msgpack.Encode(state.reply)
 	if err != nil {
 		output.err = fmt.Errorf("Failed to serialize the response: %v", err)

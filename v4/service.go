@@ -14,9 +14,11 @@ type ActionCallback func(*Action) (*Action, error)
 // NewService creates a new Service component.
 func NewService() *Service {
 	service := &Service{}
+
 	service.component = newComponent(func(s *state, c chan<- requestOutput) {
 		serviceRequestProcessor(service, s, c)
 	})
+
 	return service
 }
 
@@ -28,5 +30,6 @@ type Service struct {
 // Action assigns a callback to execute when a service action request is received.
 func (s *Service) Action(name string, callback ActionCallback) *Service {
 	s.callbacks[name] = callback
+
 	return s
 }

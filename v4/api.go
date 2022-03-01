@@ -141,5 +141,5 @@ func (a *Api) Log(value interface{}, level int) (*Api, error) {
 
 // Done returns a channel that signals the deadline or cancellation of the call.
 func (a *Api) Done() <-chan struct{} {
-	return a.state.done
+	return a.state.ctx.Done()
 }
