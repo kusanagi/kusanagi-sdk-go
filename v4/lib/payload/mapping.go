@@ -72,14 +72,14 @@ type ServiceVersion struct {
 
 // Schema contains the schema definitions for a service.
 type Schema struct {
-	Address string                  `json:"a"`
+	Address []string                `json:"a"`
 	Files   *bool                   `json:"f,omitempty"`
 	HTTP    HTTPSchema              `json:"h"`
 	Actions map[string]ActionSchema `json:"ac"`
 }
 
-// GetAddress returns the internal address of the host.
-func (s Schema) GetAddress() string {
+// GetAddress returns the internal address of the hosts.
+func (s Schema) GetAddress() []string {
 	return s.Address
 }
 

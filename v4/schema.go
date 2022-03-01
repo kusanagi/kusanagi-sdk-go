@@ -37,11 +37,6 @@ func (s ServiceSchema) GetVersion() string {
 	return s.version
 }
 
-// GetAddress returns the network address of the service.
-func (s ServiceSchema) GetAddress() string {
-	return s.payload.Address
-}
-
 // HasFileServer checks that the service has a files server enabled.
 func (s ServiceSchema) HasFileServer() bool {
 	return s.payload.Files != nil && *s.payload.Files
