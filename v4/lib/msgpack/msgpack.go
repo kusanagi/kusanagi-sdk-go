@@ -16,22 +16,30 @@ import (
 )
 
 // Encode serializes a value as a msgpack binary.
-func Encode(value interface{}) ([]byte, error) {
-	handle := new(codec.MsgpackHandle)
-	handle.WriteExt = true
-	buffer := new(bytes.Buffer)
-	encoder := codec.NewEncoder(buffer, handle)
-	if err := encoder.Encode(value); err != nil {
+func Encode(v interface{}) ([]byte, error) {
+	var (
+		h   codec.MsgpackHandle
+		buf bytes.Buffer
+	)
+
+	h.WriteExt = true
+
+	enc := codec.NewEncoder(&buf, &h)
+	if err := enc.Encode(v); err != nil {
 		return nil, err
 	}
-	return buffer.Bytes(), nil
+
+	return buf.Bytes(), nil
 }
 
 // Decode a msgkpack binary value to its original type.
-func Decode(data []byte, value interface{}) error {
-	handle := new(codec.MsgpackHandle)
-	handle.MapType = reflect.TypeOf(map[string]interface{}(nil))
-	handle.RawToString = true
-	decoder := codec.NewDecoderBytes(data, handle)
-	return decoder.Decode(value)
+func Decode(b []byte, v interface{}) error {
+	var h codec.MsgpackHandle
+
+	h.MapType = reflect.TypeOf(map[string]interface{}(nil))
+	h.RawToString = true
+
+	dec := codec.NewDecoderBytes(b, &h)
+
+	return dec.Decode(v)
 }
