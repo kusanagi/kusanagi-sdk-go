@@ -15,6 +15,11 @@ import (
 	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/log"
 )
 
+func init() {
+	// Use ERROR level until the log level can be read from the CLI arguments
+	log.SetLevel(log.ERROR)
+}
+
 // Component represents a KUSANAGI SDK generic component.
 type Component interface {
 	// HasResource checks if a resource name exist.
