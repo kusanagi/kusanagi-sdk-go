@@ -82,6 +82,7 @@ var levels = map[int]string{
 
 func getLogPrefix(level int) string {
 	timestamp := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+
 	return fmt.Sprintf("%s [%s] [SDK]", timestamp, levels[level])
 }
 
@@ -207,7 +208,7 @@ func (r RequestLogger) Emergency(v ...interface{}) {
 
 // Emergencyf logs a emergency message with format.
 func (r RequestLogger) Emergencyf(format string, v ...interface{}) {
-	Emergencyf(format, append(v, r.suffix)...)
+	Emergencyf(format+r.suffix, v...)
 }
 
 // Alert logs an alert message.
@@ -217,7 +218,7 @@ func (r RequestLogger) Alert(v ...interface{}) {
 
 // Alertf logs a alert message with format.
 func (r RequestLogger) Alertf(format string, v ...interface{}) {
-	Alertf(format, append(v, r.suffix)...)
+	Alertf(format+r.suffix, v...)
 }
 
 // Critical logs a critical message.
@@ -227,7 +228,7 @@ func (r RequestLogger) Critical(v ...interface{}) {
 
 // Criticalf logs a critical message with format.
 func (r RequestLogger) Criticalf(format string, v ...interface{}) {
-	Criticalf(format, append(v, r.suffix)...)
+	Criticalf(format+r.suffix, v...)
 }
 
 // Error logs an error message.
@@ -237,7 +238,7 @@ func (r RequestLogger) Error(v ...interface{}) {
 
 // Errorf logs an error message with format.
 func (r RequestLogger) Errorf(format string, v ...interface{}) {
-	Errorf(format, append(v, r.suffix)...)
+	Errorf(format+r.suffix, v...)
 }
 
 // Warning logs a warning message.
@@ -247,7 +248,7 @@ func (r RequestLogger) Warning(v ...interface{}) {
 
 // Warningf logs a warning message with format.
 func (r RequestLogger) Warningf(format string, v ...interface{}) {
-	Warningf(format, append(v, r.suffix)...)
+	Warningf(format+r.suffix, v...)
 }
 
 // Notice logs a notice message.
@@ -257,7 +258,7 @@ func (r RequestLogger) Notice(v ...interface{}) {
 
 // Noticef logs a notice message with format.
 func (r RequestLogger) Noticef(format string, v ...interface{}) {
-	Noticef(format, append(v, r.suffix)...)
+	Noticef(format+r.suffix, v...)
 }
 
 // Info logs an info message.
@@ -267,7 +268,7 @@ func (r RequestLogger) Info(v ...interface{}) {
 
 // Infof logs an info message with format.
 func (r RequestLogger) Infof(format string, v ...interface{}) {
-	Infof(format, append(v, r.suffix)...)
+	Infof(format+r.suffix, v...)
 }
 
 // Debug logs a debug message.
@@ -277,7 +278,7 @@ func (r RequestLogger) Debug(v ...interface{}) {
 
 // Debugf logs a debug message with format.
 func (r RequestLogger) Debugf(format string, v ...interface{}) {
-	Debugf(format, append(v, r.suffix)...)
+	Debugf(format+r.suffix, v...)
 }
 
 // Log a message.
@@ -313,5 +314,6 @@ func ValueToLogString(value interface{}) (result string, err error) {
 	if max := 100000; len(result) > max {
 		result = result[:max]
 	}
+
 	return result, nil
 }
