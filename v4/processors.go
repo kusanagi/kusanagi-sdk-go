@@ -22,42 +22,46 @@ var filesFlag = []byte("\x02")
 var transactionsFlag = []byte("\x03")
 var downloadFlag = []byte("\x04")
 
-// Handles errors returned by middleware userland callbacks.
-func handleMiddlewareUserlandError(middleware *Middleware, state *state, err error) *Response {
-	state.logger.Errorf("Callback error: %v", err)
+func buildErrorResponse(m *Middleware, s *state, err error) *Response {
+	s.logger.Errorf("Callback error: %v", err)
 
 	// Call the userland error handler
-	middleware.events.error(err)
+	m.events.error(err)
 
 	// Create a new response with the error as body contents
-	body := err.Error()
-	response := newResponse(middleware, state)
-	httpResponse := response.GetHTTPResponse()
-	httpResponse.SetStatus(500, "Internal Server Error")
-	httpResponse.SetBody([]byte(body))
-	return response
+	r := newResponse(m, s)
+
+	hr := r.GetHTTPResponse()
+	hr.SetStatus(500, "Internal Server Error")
+	hr.SetBody([]byte(err.Error()))
+
+	return r
 }
 
 // Execute a response middleware userland callback.
-func executeResponseMiddleware(middleware *Middleware, state *state) *Response {
-	state.reply = payload.NewResponseReply(&state.command)
-	callback := middleware.callbacks["response"].(ResponseCallback)
-	response, err := callback(newResponse(middleware, state))
+func executeResponseMiddleware(m *Middleware, s *state) *Response {
+	s.reply = payload.NewResponseReply(&s.command)
+	callback := m.callbacks["response"].(ResponseCallback)
+
+	r, err := callback(newResponse(m, s))
 	if err != nil {
-		response = handleMiddlewareUserlandError(middleware, state, err)
+		r = buildErrorResponse(m, s, err)
 	}
-	return response
+
+	return r
 }
 
 // Execute a request middleware userland callback.
-func executeRequestMiddleware(middleware *Middleware, state *state) interface{} {
-	state.reply = payload.NewRequestReply(&state.command)
-	callback := middleware.callbacks["request"].(RequestCallback)
-	result, err := callback(newRequest(middleware, state))
+func executeRequestMiddleware(m *Middleware, s *state) interface{} {
+	s.reply = payload.NewRequestReply(&s.command)
+	callback := m.callbacks["request"].(RequestCallback)
+
+	r, err := callback(newRequest(m, s))
 	if err != nil {
-		result = handleMiddlewareUserlandError(middleware, state, err)
+		r = buildErrorResponse(m, s, err)
 	}
-	return result
+
+	return r
 }
 
 // Processor for middleware requests.
@@ -75,11 +79,11 @@ func middlewareRequestProcessor(c Component, state *state, out chan<- requestOut
 	var result interface{}
 
 	// Execute the userland callback
-	middleware := c.(*Middleware)
+	m := c.(*Middleware)
 	if state.action == "request" {
-		result = executeRequestMiddleware(middleware, state)
+		result = executeRequestMiddleware(m, state)
 	} else {
-		result = executeResponseMiddleware(middleware, state)
+		result = executeResponseMiddleware(m, state)
 	}
 
 	var reply payload.Reply
@@ -103,19 +107,6 @@ func middlewareRequestProcessor(c Component, state *state, out chan<- requestOut
 	out <- output
 }
 
-// Handle error when executing userland service callbacks.
-func handleServiceUserlandError(service *Service, state *state, err error) *Action {
-	state.logger.Errorf("Callback error: %v", err)
-
-	// Call the userland error handler
-	service.events.error(err)
-
-	// Create a new action with an error
-	action := newAction(service, state)
-	action.Error(err.Error(), 500, "Internal Server Error")
-	return action
-}
-
 // Processor for service requests.
 func serviceRequestProcessor(c Component, state *state, out chan<- requestOutput) {
 	defer close(out)
@@ -132,12 +123,23 @@ func serviceRequestProcessor(c Component, state *state, out chan<- requestOutput
 	// Execute the userland callback
 	service := c.(*Service)
 	callback := service.callbacks[state.action].(ActionCallback)
-
 	state.reply = payload.NewActionReply(&state.command)
 
 	action, err := callback(newAction(service, state))
-	if err != nil {
-		action = handleServiceUserlandError(service, state, err)
+	if action == nil {
+		panic(fmt.Sprintf("callback returned a nil action: %s", state.action))
+	} else if err != nil {
+		state.logger.Errorf("Callback error: %v", err)
+
+		// Call the userland error handler
+		service.events.error(err)
+
+		// Create a new error reply that contains the userland error message
+		r := payload.NewErrorReply()
+		r.Error.Message = err.Error()
+
+		// Change the reply to contain an error
+		state.reply = &r
 	}
 
 	var flags []byte
