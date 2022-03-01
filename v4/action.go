@@ -45,6 +45,7 @@ func newAction(c Component, s *state) *Action {
 	service := api.GetName()
 	version := api.GetVersion()
 	files := make(map[string]payload.File)
+
 	if transport.Files != nil {
 		for _, f := range transport.Files.Get(gateway, service, version, s.action) {
 			files[f.Name] = f
@@ -101,12 +102,14 @@ func (a *Action) checkFiles(schema *ServiceSchema, files []File) error {
 			return errors.New("File server not configured")
 		}
 	}
+
 	return nil
 }
 
 // IsOrigin checks if the current service is the origin of the request.
 func (a *Action) IsOrigin() bool {
 	o := a.reply.Command.Result.Transport.Meta.Origin
+
 	return o[0] == a.GetName() && o[1] == a.GetVersion() && o[2] == a.GetActionName()
 }
 
@@ -120,7 +123,14 @@ func (a *Action) GetActionName() string {
 // name: The property name.
 // value: The property value.
 func (a *Action) SetProperty(name, value string) *Action {
-	a.reply.Command.Result.Transport.Meta.Properties[name] = value
+	meta := a.reply.Command.Result.Transport.Meta
+
+	if meta.Properties == nil {
+		meta.Properties = make(map[string]string)
+	}
+
+	meta.Properties[name] = value
+
 	return a
 }
 
@@ -129,6 +139,7 @@ func (a *Action) SetProperty(name, value string) *Action {
 // name: The name of the parameter.
 func (a *Action) HasParam(name string) bool {
 	_, exists := a.params[name]
+
 	return exists
 }
 
@@ -139,6 +150,7 @@ func (a *Action) GetParam(name string) *Param {
 	if p, exists := a.params[name]; exists {
 		return payloadToParam(p)
 	}
+
 	return newEmptyParam(name)
 }
 
@@ -147,6 +159,7 @@ func (a *Action) GetParams() (params []*Param) {
 	for _, p := range a.params {
 		params = append(params, payloadToParam(p))
 	}
+
 	return params
 }
 
@@ -168,6 +181,7 @@ func (a *Action) NewParam(name string, value interface{}, dataType string) (*Par
 // name: The name of the file parameter.
 func (a *Action) HasFile(name string) bool {
 	_, exists := a.files[name]
+
 	return exists
 }
 
@@ -176,16 +190,18 @@ func (a *Action) HasFile(name string) bool {
 // name: The name of the file parameter.
 func (a *Action) GetFile(name string) File {
 	if f, exists := a.files[name]; exists {
-		return payloadToFile(f)
+		return payloadToFile(&f)
 	}
+
 	return File{name: name}
 }
 
 // GetFiles returns all the uploaded files.
 func (a *Action) GetFiles() (files []File) {
 	for _, f := range a.files {
-		files = append(files, payloadToFile(f))
+		files = append(files, payloadToFile(&f))
 	}
+
 	return files
 }
 
@@ -206,6 +222,7 @@ func (a *Action) SetDownload(f File) (*Action, error) {
 	if f.IsLocal() {
 		name := a.GetName()
 		version := a.GetVersion()
+
 		schema, err := a.GetServiceSchema(name, version)
 		if err != nil {
 			return nil, err
@@ -213,8 +230,10 @@ func (a *Action) SetDownload(f File) (*Action, error) {
 			return nil, fmt.Errorf(`File server not configured: "%s" (%s)`, name, version)
 		}
 	}
+
 	p := fileToPayload(f)
 	a.transport.SetDownload(&p)
+
 	return a, nil
 }
 
@@ -225,6 +244,7 @@ func (a *Action) SetReturn(value interface{}) (*Action, error) {
 	if a.schemas != nil {
 		name := a.GetName()
 		version := a.GetVersion()
+
 		// Check that the schema for the current action is available
 		schema, err := a.GetServiceSchema(name, version)
 		if err != nil {
@@ -253,7 +273,9 @@ func (a *Action) SetReturn(value interface{}) (*Action, error) {
 		// setting of return values must be allowed without restrictions in this case.
 		a.logger.Warning("Return value set without discovery mapping available")
 	}
+
 	a.transport.SetReturn(value)
+
 	return a, nil
 }
 
@@ -275,6 +297,7 @@ func (a *Action) SetEntity(entity interface{}) (*Action, error) {
 
 	// Add the entity to the transport
 	a.transport.SetData(a.GetName(), a.GetVersion(), a.GetActionName(), entity)
+
 	return a, nil
 }
 
@@ -296,6 +319,7 @@ func (a *Action) SetCollection(collection interface{}) (*Action, error) {
 
 	// Add the collection to the transport
 	a.transport.SetData(a.GetName(), a.GetVersion(), a.GetActionName(), collection)
+
 	return a, nil
 }
 
@@ -316,6 +340,7 @@ func (a *Action) RelateOne(pk, service, fk string) (*Action, error) {
 	}
 
 	a.transport.SetRelateOne(a.GetName(), pk, service, fk)
+
 	return a, nil
 }
 
@@ -336,6 +361,7 @@ func (a *Action) RelateMany(pk, service string, fks []string) (*Action, error) {
 	}
 
 	a.transport.SetRelateMany(a.GetName(), pk, service, fks)
+
 	return a, nil
 }
 
@@ -361,6 +387,7 @@ func (a *Action) RelateOneRemote(pk, address, service, fk string) (*Action, erro
 	}
 
 	a.transport.SetRelateOneRemote(a.GetName(), pk, address, service, fk)
+
 	return a, nil
 }
 
@@ -386,6 +413,7 @@ func (a *Action) RelateManyRemote(pk, address, service string, fks []string) (*A
 	}
 
 	a.transport.SetRelateManyRemote(a.GetName(), pk, address, service, fks)
+
 	return a, nil
 }
 
@@ -401,6 +429,7 @@ func (a *Action) SetLink(link, uri string) (*Action, error) {
 	}
 
 	a.transport.SetLink(a.GetName(), link, uri)
+
 	return a, nil
 }
 
@@ -421,6 +450,7 @@ func (a *Action) Commit(action string, params []*Param) (*Action, error) {
 		action,
 		paramsToPayload(params),
 	)
+
 	return a, nil
 }
 
@@ -441,6 +471,7 @@ func (a *Action) Rollback(action string, params []*Param) (*Action, error) {
 		action,
 		paramsToPayload(params),
 	)
+
 	return a, nil
 }
 
@@ -461,6 +492,7 @@ func (a *Action) Complete(action string, params []*Param) (*Action, error) {
 		action,
 		paramsToPayload(params),
 	)
+
 	return a, nil
 }
 
@@ -524,8 +556,10 @@ func (a *Action) Call(
 		timeout = ExecutionTimeout
 	}
 
-	var transport *payload.Transport
-	var duration time.Duration
+	var (
+		transport *payload.Transport
+		duration  time.Duration
+	)
 
 	// Make sure the action's transport always contains the call info
 	// TODO: Check that duration and transport are set correctly after the runtime call
@@ -558,6 +592,7 @@ func (a *Action) Call(
 		a.input.IsTCPEnabled(),
 		timeout,
 	)
+
 	if err != nil {
 		return nil, fmt.Errorf("Run-time call failed: %v", err)
 	}
@@ -571,6 +606,7 @@ func (a *Action) Call(
 	// When the call succeeds update the transport and duration
 	duration = result.Duration
 	transport = result.Transport
+
 	return result.ReturnValue, nil
 }
 
@@ -620,6 +656,7 @@ func (a *Action) DeferCall(service, version, action string, params []*Param, fil
 		paramsToPayload(params),
 		filesToPayload(files),
 	)
+
 	return a, nil
 }
 
@@ -692,6 +729,7 @@ func (a *Action) RemoteCall(
 		paramsToPayload(params),
 		filesToPayload(files),
 	)
+
 	return a, nil
 }
 
@@ -706,6 +744,8 @@ func (a *Action) Error(message string, code int, status string) *Action {
 	if status == "" {
 		status = payload.DefaultErrorStatus
 	}
+
 	a.transport.SetError(a.GetName(), a.GetVersion(), message, code, status)
+
 	return a
 }

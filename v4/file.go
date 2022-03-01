@@ -223,7 +223,7 @@ func fileToPayload(f File) payload.File {
 }
 
 // Converts a file payload to a file.
-func payloadToFile(f payload.File) File {
+func payloadToFile(f *payload.File) File {
 	return File{
 		name:     f.Name,
 		path:     f.Path,

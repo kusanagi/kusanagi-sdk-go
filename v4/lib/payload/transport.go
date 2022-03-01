@@ -34,51 +34,53 @@ func transactionKey(command string) string {
 
 func mergeRuntimeCallTransportData(source, target *Transport) {
 	if target.Data == nil {
-		target.Data = &ServiceData{}
+		target.Data = ServiceData{}
 	}
-	target.Data.merge(*source.Data)
+
+	target.Data.merge(source.Data)
 }
 
 func mergeRuntimeCallTransportRelations(source, target *Transport) {
 	if target.Relations == nil {
-		target.Relations = &Relations{}
+		target.Relations = Relations{}
 	}
-	target.Relations.merge(*source.Relations)
+
+	target.Relations.merge(source.Relations)
 }
 
 func mergeRuntimeCallTransportLinks(source, target *Transport) {
 	if target.Links == nil {
-		target.Links = &Links{}
+		target.Links = Links{}
 	}
-	target.Links.merge(*source.Links)
+	target.Links.merge(source.Links)
 }
 
 func mergeRuntimeCallTransportCalls(source, target *Transport) {
 	if target.Calls == nil {
-		target.Calls = &Calls{}
+		target.Calls = Calls{}
 	}
-	target.Calls.merge(*source.Calls)
+	target.Calls.merge(source.Calls)
 }
 
 func mergeRuntimeCallTransportTransactions(source, target *Transport) {
 	if target.Transactions == nil {
-		target.Transactions = &Transactions{}
+		target.Transactions = Transactions{}
 	}
-	target.Transactions.merge(*source.Transactions)
+	target.Transactions.merge(source.Transactions)
 }
 
 func mergeRuntimeCallTransportErrors(source, target *Transport) {
 	if target.Errors == nil {
-		target.Errors = &Errors{}
+		target.Errors = Errors{}
 	}
-	target.Errors.merge(*source.Errors)
+	target.Errors.merge(source.Errors)
 }
 
 func mergeRuntimeCallTransportFiles(source, target *Transport) {
 	if target.Files == nil {
-		target.Files = &Files{}
+		target.Files = Files{}
 	}
-	target.Files.merge(*source.Files)
+	target.Files.merge(source.Files)
 }
 
 // Merge a transport returned from a run-time call into another transport.
@@ -126,36 +128,39 @@ type Transport struct {
 	reply        *Reply
 	Meta         TransportMeta `json:"m"`
 	Body         *File         `json:"b,omitempty"`
-	Files        *Files        `json:"f,omitempty"`
-	Data         *ServiceData  `json:"d,omitempty"`
-	Relations    *Relations    `json:"r,omitempty"`
-	Links        *Links        `json:"l,omitempty"`
-	Transactions *Transactions `json:"t,omitempty"`
-	Calls        *Calls        `json:"C,omitempty"`
-	Errors       *Errors       `json:"e,omitempty"`
+	Files        Files         `json:"f,omitempty"`
+	Data         ServiceData   `json:"d,omitempty"`
+	Relations    Relations     `json:"r,omitempty"`
+	Links        Links         `json:"l,omitempty"`
+	Transactions Transactions  `json:"t,omitempty"`
+	Calls        Calls         `json:"C,omitempty"`
+	Errors       Errors        `json:"e,omitempty"`
 }
 
 // Append files to the transport.
 func (t *Transport) appendFiles(address, service, version, action string, files ...File) {
 	if t.Files == nil {
-		t.Files = &Files{}
+		t.Files = Files{}
 	}
+
 	t.Files.append(address, service, version, action, files...)
 }
 
 // Add a relation to the transport.
 func (t *Transport) setRelation(address, service, pk, remoteAddress, remoteService string, foreignKey interface{}) {
 	if t.Relations == nil {
-		t.Relations = &Relations{}
+		t.Relations = Relations{}
 	}
+
 	t.Relations.add(address, service, pk, remoteAddress, remoteService, foreignKey)
 }
 
 // Append calls to the transport.
 func (t *Transport) appendCalls(service, version string, calls ...Call) {
 	if t.Calls == nil {
-		t.Calls = &Calls{}
+		t.Calls = Calls{}
 	}
+
 	t.Calls.append(service, version, calls...)
 }
 
@@ -253,8 +258,10 @@ func (t *Transport) SetDownload(f *File) bool {
 func (t *Transport) SetReturn(value interface{}) bool {
 	if t.reply != nil {
 		t.reply.Command.Result.Return = value
+
 		return true
 	}
+
 	return false
 }
 
@@ -273,8 +280,9 @@ func (t *Transport) SetData(name, version, action string, data interface{}) {
 	}
 
 	if t.Data == nil {
-		t.Data = &ServiceData{}
+		t.Data = ServiceData{}
 	}
+
 	t.Data.append(t.GetGateway()[1], name, version, action, data)
 }
 
@@ -290,6 +298,7 @@ func (t *Transport) SetRelateOne(service, pk, remote, fk string) {
 	}
 
 	gateway := t.GetGateway()[1]
+
 	t.setRelation(gateway, service, pk, gateway, remote, fk)
 }
 
@@ -305,6 +314,7 @@ func (t *Transport) SetRelateMany(service, pk, remote string, fks []string) {
 	}
 
 	gateway := t.GetGateway()[1]
+
 	t.setRelation(gateway, service, pk, gateway, remote, fks)
 }
 
@@ -349,7 +359,7 @@ func (t *Transport) SetLink(service, link, uri string) {
 	}
 
 	if t.Links == nil {
-		t.Links = &Links{}
+		t.Links = Links{}
 	}
 
 	t.Links.add(t.GetGateway()[1], service, link, uri)
@@ -369,7 +379,7 @@ func (t *Transport) SetTransaction(command, service, version, action, target str
 	}
 
 	if t.Transactions == nil {
-		t.Transactions = &Transactions{}
+		t.Transactions = Transactions{}
 	}
 
 	t.Transactions.append(command, Transaction{
@@ -571,8 +581,9 @@ func (t *Transport) SetError(service, version, message string, code int, status 
 	}
 
 	if t.Errors == nil {
-		t.Errors = &Errors{}
+		t.Errors = Errors{}
 	}
+
 	t.Errors.append(t.GetGateway()[1], service, version, Error{
 		Message: message,
 		Code:    code,
@@ -674,21 +685,26 @@ func (f Fallback) GetActionNames() (actions []string) {
 // Files contains the transport files.
 type Files map[string]map[string]map[string]map[string][]File
 
-func (f Files) clone() *Files {
+func (f Files) clone() Files {
 	clone := Files{}
+
 	for address, services := range f {
 		clone[address] = make(map[string]map[string]map[string][]File)
+
 		for service, versions := range services {
 			clone[address][service] = make(map[string]map[string][]File)
+
 			for version, actions := range versions {
 				clone[address][service][version] = make(map[string][]File)
+
 				for action, files := range actions {
 					clone[address][service][version][action] = append([]File{}, files...)
 				}
 			}
 		}
 	}
-	return &clone
+
+	return clone
 }
 
 func (f Files) append(address, service, version, action string, files ...File) {
@@ -757,21 +773,26 @@ func (f Files) Get(address, name, version, action string) []File {
 // ServiceData contains the transport data of the called services.
 type ServiceData map[string]map[string]map[string]map[string][]interface{}
 
-func (s ServiceData) clone() *ServiceData {
+func (s ServiceData) clone() ServiceData {
 	clone := ServiceData{}
+
 	for address, services := range s {
 		clone[address] = make(map[string]map[string]map[string][]interface{})
+
 		for service, versions := range services {
 			clone[address][service] = make(map[string]map[string][]interface{})
+
 			for version, actions := range versions {
 				clone[address][service][version] = make(map[string][]interface{})
+
 				for action, data := range actions {
 					clone[address][service][version][action] = append([]interface{}{}, data...)
 				}
 			}
 		}
 	}
-	return &clone
+
+	return clone
 }
 
 func (s ServiceData) append(address, service, version, action string, data ...interface{}) {
@@ -823,16 +844,21 @@ func (s ServiceData) merge(source ServiceData) {
 // Relations contains the transport relations.
 type Relations map[string]map[string]map[string]map[string]map[string]interface{}
 
-func (r Relations) clone() *Relations {
+func (r Relations) clone() Relations {
 	clone := Relations{}
+
 	for address, services := range r {
 		clone[address] = make(map[string]map[string]map[string]map[string]interface{})
+
 		for service, pks := range services {
 			clone[address][service] = make(map[string]map[string]map[string]interface{})
+
 			for pk, remoteAddresses := range pks {
 				clone[address][service][pk] = make(map[string]map[string]interface{})
+
 				for remoteAddress, remoteServices := range remoteAddresses {
 					clone[address][service][pk][remoteAddress] = make(map[string]interface{})
+
 					for remoteService, foreignKey := range remoteServices {
 						clone[address][service][pk][remoteAddress][remoteService] = foreignKey
 					}
@@ -840,7 +866,8 @@ func (r Relations) clone() *Relations {
 			}
 		}
 	}
-	return &clone
+
+	return clone
 }
 
 func (r Relations) add(address, service, pk, remoteAddress, remoteService string, foreignKey interface{}) {
@@ -899,18 +926,22 @@ func (r Relations) merge(source Relations) {
 // Links contains the transport links.
 type Links map[string]map[string]map[string]string
 
-func (l Links) clone() *Links {
+func (l Links) clone() Links {
 	clone := Links{}
+
 	for address, services := range l {
 		clone[address] = make(map[string]map[string]string)
+
 		for service, links := range services {
 			clone[address][service] = make(map[string]string)
+
 			for link, uri := range links {
 				clone[address][service][link] = uri
 			}
 		}
 	}
-	return &clone
+
+	return clone
 }
 
 func (l Links) add(address, service, link, uri string) {
@@ -956,12 +987,14 @@ func (t Transactions) Get(command string) (trx []Transaction) {
 	return trx
 }
 
-func (t Transactions) clone() *Transactions {
+func (t Transactions) clone() Transactions {
 	clone := Transactions{}
+
 	for key, trxs := range t {
 		clone[key] = append(clone[key], trxs...)
 	}
-	return &clone
+
+	return clone
 }
 
 func (t Transactions) append(command string, trxs ...Transaction) {
@@ -1002,15 +1035,18 @@ func (c Calls) get(service, version string) []Call {
 	return nil
 }
 
-func (c Calls) clone() *Calls {
+func (c Calls) clone() Calls {
 	clone := Calls{}
+
 	for service, versions := range c {
 		clone[service] = versions
+
 		for version, calls := range versions {
 			clone[service][version] = append(clone[service][version], calls...)
 		}
 	}
-	return &clone
+
+	return clone
 }
 
 func (c Calls) append(service, version string, calls ...Call) {
@@ -1055,18 +1091,22 @@ type Call struct {
 // Errors contains the transport errors.
 type Errors map[string]map[string]map[string][]Error
 
-func (e Errors) clone() *Errors {
+func (e Errors) clone() Errors {
 	clone := Errors{}
+
 	for address, services := range e {
 		clone[address] = services
+
 		for service, versions := range services {
 			clone[address][service] = versions
+
 			for version, errors := range versions {
 				clone[address][service][version] = append(clone[address][service][version], errors...)
 			}
 		}
 	}
-	return &clone
+
+	return clone
 }
 
 func (e Errors) append(address, service, version string, errors ...Error) {

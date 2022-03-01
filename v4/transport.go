@@ -59,19 +59,23 @@ func (t Transport) GetProperty(name, preset string) string {
 			return value
 		}
 	}
+
 	return preset
 }
 
 // GetProperties returns all the userland properties.
-func (t Transport) GetProperties() (properties map[string]string) {
-	if t.payload.Meta.Properties != nil {
-		// Create a new map with the transport meta properties
-		properties = make(map[string]string)
-		for name, value := range t.payload.Meta.Properties {
-			properties[name] = value
-		}
+func (t Transport) GetProperties() map[string]string {
+	if t.payload.Meta.Properties == nil {
+		return nil
 	}
-	return properties
+
+	p := make(map[string]string)
+
+	for name, v := range t.payload.Meta.Properties {
+		p[name] = v
+	}
+
+	return p
 }
 
 // HasDownload checks if a file download has been registered for the response.
@@ -80,11 +84,14 @@ func (t Transport) HasDownload() bool {
 }
 
 // GetDownload returns the file download registered for the response.
-func (t Transport) GetDownload() (f *File) {
+func (t Transport) GetDownload() *File {
 	if t.payload.Body != nil {
-		*f = payloadToFile(*t.payload.Body)
+		f := payloadToFile(t.payload.Body)
+
+		return &f
 	}
-	return f
+
+	return nil
 }
 
 // GetData returns the transport data.
@@ -93,43 +100,58 @@ func (t Transport) GetData() (data []ServiceData) {
 		return nil
 	}
 
-	for address, services := range *t.payload.Data {
+	for address, services := range t.payload.Data {
 		for service, versions := range services {
 			for version, actions := range versions {
 				data = append(data, ServiceData{address, service, version, actions})
 			}
 		}
 	}
+
 	return data
 }
 
 // GetRelations returns the service relations.
 func (t Transport) GetRelations() (relations []Relation) {
-	for address, services := range *t.payload.Relations {
+	if t.payload.Relations == nil {
+		return nil
+	}
+
+	for address, services := range t.payload.Relations {
 		for service, pks := range services {
 			for pk, foreign := range pks {
 				relations = append(relations, Relation{address, service, pk, foreign})
 			}
 		}
 	}
+
 	return relations
 }
 
 // GetLinks returns the service links.
 func (t Transport) GetLinks() (links []Link) {
-	for address, services := range *t.payload.Links {
+	if t.payload.Links == nil {
+		return nil
+	}
+
+	for address, services := range t.payload.Links {
 		for service, references := range services {
 			for ref, uri := range references {
 				links = append(links, Link{address, service, ref, uri})
 			}
 		}
 	}
+
 	return links
 }
 
 // GetCalls returns the service calls.
 func (t Transport) GetCalls() (callers []Caller) {
-	for service, versions := range *t.payload.Calls {
+	if t.payload.Calls == nil {
+		return nil
+	}
+
+	for service, versions := range t.payload.Calls {
 		for version, calls := range versions {
 			for _, call := range calls {
 				callee := Callee{
@@ -146,6 +168,7 @@ func (t Transport) GetCalls() (callers []Caller) {
 			}
 		}
 	}
+
 	return callers
 }
 
@@ -160,6 +183,7 @@ func (t Transport) GetTransactions(command string) ([]Transaction, error) {
 	}
 
 	var transactions []Transaction
+
 	for _, trx := range t.payload.Transactions.Get(command) {
 		transactions = append(transactions, Transaction{
 			command: command,
@@ -170,6 +194,7 @@ func (t Transport) GetTransactions(command string) ([]Transaction, error) {
 			params:  payloadToParams(trx.Params),
 		})
 	}
+
 	return transactions, nil
 }
 
@@ -179,7 +204,7 @@ func (t Transport) GetErrors() (result []Error) {
 		return nil
 	}
 
-	for address, services := range *t.payload.Errors {
+	for address, services := range t.payload.Errors {
 		for service, versions := range services {
 			for version, errors := range versions {
 				for _, err := range errors {
@@ -195,5 +220,6 @@ func (t Transport) GetErrors() (result []Error) {
 			}
 		}
 	}
+
 	return result
 }

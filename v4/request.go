@@ -190,7 +190,7 @@ func newHTTPRequest(p *payload.HTTPRequest) *HTTPRequest {
 
 	// Index files by name
 	for _, f := range p.Files {
-		r.files[f.Name] = payloadToFile(f)
+		r.files[f.Name] = payloadToFile(&f)
 	}
 
 	return &r
