@@ -54,8 +54,8 @@ func (t Transport) GetOriginDuration() uint {
 // name: The name of the property.
 // preset: The default value to use when the property doesn't exist.
 func (t Transport) GetProperty(name, preset string) string {
-	if properties := t.payload.Meta.Properties; properties != nil {
-		if value, ok := properties[name]; ok {
+	if p := t.payload.Meta.Properties; p != nil {
+		if value, ok := p[name]; ok {
 			return value
 		}
 	}

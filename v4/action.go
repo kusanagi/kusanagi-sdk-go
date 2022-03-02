@@ -123,13 +123,13 @@ func (a *Action) GetActionName() string {
 // name: The property name.
 // value: The property value.
 func (a *Action) SetProperty(name, value string) *Action {
-	meta := a.reply.Command.Result.Transport.Meta
+	t := a.reply.Command.Result.Transport
 
-	if meta.Properties == nil {
-		meta.Properties = make(map[string]string)
+	if t.Meta.Properties == nil {
+		t.Meta.Properties = make(map[string]string)
 	}
 
-	meta.Properties[name] = value
+	t.Meta.Properties[name] = value
 
 	return a
 }

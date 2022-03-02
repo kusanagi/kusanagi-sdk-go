@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Action properties are now properly assigned to transport
 
 ## [4.0.0] - 2022-03-01
 ### Added
