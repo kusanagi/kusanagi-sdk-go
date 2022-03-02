@@ -20,9 +20,11 @@ func Serialize(value interface{}, pretty bool) (string, error) {
 	if pretty {
 		encoder.SetIndent("", "  ")
 	}
+
 	if err := encoder.Encode(value); err != nil {
 		return "", err
 	}
+
 	return buffer.String(), nil
 }
 
@@ -31,6 +33,7 @@ func Deserialize(data string) (value interface{}, err error) {
 	if err = json.Unmarshal([]byte(data), &value); err != nil {
 		return nil, err
 	}
+
 	return value, nil
 }
 
@@ -38,5 +41,6 @@ func Deserialize(data string) (value interface{}, err error) {
 // An empty string is returned when serialization fails.
 func Dump(value interface{}) string {
 	v, _ := Serialize(value, true)
+
 	return v
 }

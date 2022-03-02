@@ -295,25 +295,25 @@ type HTTPActionSchema struct {
 
 // ParamSchema contains the schema definition of action parameters.
 type ParamSchema struct {
-	Name         string                 `json:"n"`
-	Type         string                 `json:"t,omitempty"`
-	Format       string                 `json:"f,omitempty"`
-	ArrayFormat  string                 `json:"af,omitempty"`
-	Pattern      string                 `json:"p,omitempty"`
-	AllowEmpty   bool                   `json:"e,omitempty"`
-	DefaultValue interface{}            `json:"d,omitempty"`
-	Required     bool                   `json:"r,omitempty"`
-	Items        map[string]interface{} `json:"i,omitempty"`
-	Max          *int                   `json:"mx,omitempty"`
-	ExclusiveMax bool                   `json:"ex,omitempty"`
-	Min          *int                   `json:"mn,omitempty"`
-	ExclusiveMin bool                   `json:"en,omitempty"`
-	MaxItems     int                    `json:"xi,omitempty"`
-	MinItems     *int                   `json:"ni,omitempty"`
-	UniqueItems  bool                   `json:"ui,omitempty"`
-	Enum         []interface{}          `json:"em,omitempty"`
-	MultipleOf   int                    `json:"mo,omitempty"`
-	HTTP         HTTPParamSchema        `json:"h,omitempty"`
+	Name         string          `json:"n"`
+	Type         string          `json:"t,omitempty"`
+	Format       string          `json:"f,omitempty"`
+	ArrayFormat  string          `json:"af,omitempty"`
+	Pattern      string          `json:"p,omitempty"`
+	AllowEmpty   bool            `json:"e,omitempty"`
+	DefaultValue interface{}     `json:"d,omitempty"`
+	Required     bool            `json:"r,omitempty"`
+	Items        string          `json:"i,omitempty"`
+	Max          *float64        `json:"mx,omitempty"`
+	ExclusiveMax bool            `json:"ex,omitempty"`
+	Min          *float64        `json:"mn,omitempty"`
+	ExclusiveMin bool            `json:"en,omitempty"`
+	MaxItems     int             `json:"xi,omitempty"`
+	MinItems     *int            `json:"ni,omitempty"`
+	UniqueItems  bool            `json:"ui,omitempty"`
+	Enum         []interface{}   `json:"em,omitempty"`
+	MultipleOf   int             `json:"mo,omitempty"`
+	HTTP         HTTPParamSchema `json:"h,omitempty"`
 }
 
 // HTTPParamSchema contains the HTTP schema definition for a parameter.

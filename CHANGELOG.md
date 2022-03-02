@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - Action properties are now properly assigned to transport
+- Parameter schema changed types for "items", "max" and "min"
 
 ## [4.0.0] - 2022-03-01
 ### Added

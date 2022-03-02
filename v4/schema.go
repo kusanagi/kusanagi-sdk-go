@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/datatypes"
+	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/json"
 	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
 	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/semver"
 )
@@ -618,11 +619,22 @@ func (s ParamSchema) IsRequired() bool {
 }
 
 // GetItems returns the JSON schema with items object definition.
-func (s ParamSchema) GetItems() map[string]interface{} {
+func (s ParamSchema) GetItems() (map[string]interface{}, error) {
 	if s.payload.Type != datatypes.Array {
-		return make(map[string]interface{})
+		return make(map[string]interface{}), nil
 	}
-	return s.payload.Items
+
+	v, err := json.Deserialize(s.payload.Items)
+	if err != nil {
+		return nil, err
+	}
+
+	items, ok := v.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf(`Param "%s" does not have a valid JSON schema for items`, s.GetName())
+	}
+
+	return items, nil
 }
 
 // GetMax returns the maximum value for parameter.
@@ -630,7 +642,7 @@ func (s ParamSchema) GetMax() int {
 	if s.payload.Max == nil {
 		return datatypes.MaxInt
 	}
-	return *s.payload.Max
+	return int(*s.payload.Max)
 }
 
 // IsExclusiveMax chechs that the maximum value is inclusive.
@@ -643,7 +655,7 @@ func (s ParamSchema) GetMin() int {
 	if s.payload.Min == nil {
 		return datatypes.MinInt
 	}
-	return *s.payload.Min
+	return int(*s.payload.Min)
 }
 
 // IsExclusiveMin checks that minimum value is inclusive.

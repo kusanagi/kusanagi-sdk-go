@@ -8,9 +8,7 @@
 
 package kusanagi
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Empty frame defines an empty frame for a multipart response.
 var emptyFrame = []byte("\x00")
@@ -37,6 +35,7 @@ func (m requestMsg) check() error {
 	if length := len(m); length != 7 {
 		return fmt.Errorf("Invalid multipart request length: %d", length)
 	}
+
 	return nil
 }
 
@@ -55,6 +54,7 @@ func (m requestMsg) getSchemas() []byte {
 	if v := m[msgSchemasPart]; len(v) > 0 {
 		return v
 	}
+
 	return nil
 }
 
@@ -72,5 +72,6 @@ func (m requestMsg) makeResponseMessage(parts ...[]byte) responseMsg {
 		m[msgEmptyPart],
 		m[msgRequestIDPart],
 	}
+
 	return append(response, parts...)
 }
