@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Action properties are now properly assigned to transport
 - Parameter schema changed types for "items", "max" and "min"
 - Response reply payload does not leak the call data into the payload anymore
+- Request initializes the attributes on demand when there are no attributes
 
 ## [4.0.0] - 2022-03-01
 ### Added

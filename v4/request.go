@@ -62,6 +62,10 @@ func (r *Request) GetClientAddress() string {
 
 // SetAttribute registers a request attribute.
 func (r *Request) SetAttribute(name, value string) *Request {
+	if r.reply.Command.Result.Attributes == nil {
+		r.reply.Command.Result.Attributes = make(map[string]string)
+	}
+
 	r.reply.Command.Result.Attributes[name] = value
 	return r
 }
