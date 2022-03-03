@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Response reply payload does not leak the call data into the payload anymore
 - Request initializes the attributes on demand when there are no attributes
 - Change service processor to return action errors as transport errors instead of error replies
+- Changed local file token validation to fail when there is a token
 
 ## [4.0.0] - 2022-03-01
 ### Added

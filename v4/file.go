@@ -72,7 +72,7 @@ func NewFile(name, path, mimeType, filename string, size uint, token string) (*F
 		}
 	} else if length > 0 {
 		// Token must be used for remote files only
-		if strings.TrimSpace(token) == "" {
+		if strings.TrimSpace(token) != "" {
 			return nil, errors.New("unexpected file token")
 		}
 
