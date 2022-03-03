@@ -72,6 +72,7 @@ func middlewareRequestProcessor(c Component, state *state, out chan<- requestOut
 		// Handle panics gracefully
 		if err := recover(); err != nil {
 			state.logger.Criticalf("Panic: %v\n%s", err, debug.Stack())
+
 			out <- requestOutput{state: state, err: fmt.Errorf("Panic: %v", err)}
 		}
 	}()
@@ -134,12 +135,8 @@ func serviceRequestProcessor(c Component, state *state, out chan<- requestOutput
 		// Call the userland error handler
 		service.events.error(err)
 
-		// Create a new error reply that contains the userland error message
-		r := payload.NewErrorReply()
-		r.Error.Message = err.Error()
-
-		// Change the reply to contain an error
-		state.reply = &r
+		// Add the error to the action to it is saved in the transport
+		action.Error(err.Error(), 0, "500 Internal Server Error")
 	}
 
 	var flags []byte
