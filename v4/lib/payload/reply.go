@@ -127,7 +127,7 @@ func (r *Reply) ForRequest() Reply {
 
 // ForResponse prepares the reply for a response middleware.
 func (r *Reply) ForResponse() Reply {
-	r.Command.Result.Transport = nil
+	r.Command.Result.Call = nil
 	return *r
 }
 
