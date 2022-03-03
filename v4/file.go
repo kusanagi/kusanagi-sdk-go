@@ -21,6 +21,8 @@ import (
 	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
 )
 
+var ErrFileNotExist = errors.New("File doesn't exist")
+
 func checkLocalFileExist(path string) error {
 	// Remove the schema from the path
 	if path[:7] == "file://" {
@@ -28,7 +30,7 @@ func checkLocalFileExist(path string) error {
 	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return fmt.Errorf(`file doesn't exist: "%s"`, path)
+		return fmt.Errorf(`%w: "%s"`, ErrFileNotExist, path)
 	}
 	return nil
 }
