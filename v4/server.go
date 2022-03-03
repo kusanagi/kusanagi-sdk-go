@@ -28,7 +28,7 @@ import (
 type state struct {
 	id      string
 	action  string
-	schemas *payload.Mapping
+	schemas payload.Mapping
 	command payload.Command
 	reply   *payload.Reply
 	payload []byte
@@ -165,7 +165,7 @@ func (s *server) startMessageListener(msgc <-chan requestMsg) <-chan requestOutp
 	// Handle messages until the messages channel is closed
 	go func() {
 		// TODO: See how to avoid race conditions when mapping are updated here (and read by userland)
-		var schemas *payload.Mapping
+		var schemas payload.Mapping
 
 		// Get the title to use for the component
 		title := s.input.GetComponentTitle()

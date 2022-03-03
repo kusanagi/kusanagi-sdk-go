@@ -9,6 +9,7 @@
 package kusanagi
 
 import (
+	"errors"
 	"path"
 
 	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/cli"
@@ -18,7 +19,8 @@ import (
 
 func newApi(c Component, s *state) *Api {
 	if s.schemas == nil {
-		s.logger.Warning("Discovery mappings are not available")
+		// This can happen when there are no registered services in the realm
+		s.logger.Warning("Discovery schemas are not available")
 	}
 
 	return &Api{
@@ -37,7 +39,7 @@ type Api struct {
 	component Component
 	state     *state
 	input     cli.Input
-	schemas   *payload.Mapping
+	schemas   payload.Mapping
 	logger    log.RequestLogger
 	command   payload.Command
 	reply     *payload.Reply
@@ -103,7 +105,11 @@ func (a *Api) GetResource(name string) (interface{}, error) {
 
 // GetServices return service names and versions from the mapping schemas.
 func (a *Api) GetServices() []payload.ServiceVersion {
-	return a.schemas.GetServices()
+	if a.schemas != nil {
+		return a.schemas.GetServices()
+	}
+
+	return nil
 }
 
 // GetServiceSchema returns a schema for a service.
@@ -114,6 +120,10 @@ func (a *Api) GetServices() []payload.ServiceVersion {
 // name: The name of the service.
 // version: The version of the service.
 func (a *Api) GetServiceSchema(name, version string) (*ServiceSchema, error) {
+	if a.schemas == nil {
+		return nil, errors.New("Service schemas are not available")
+	}
+
 	payload, err := a.schemas.GetSchema(name, version)
 	if err != nil {
 		return nil, err
