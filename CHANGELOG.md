@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Response.GetTransport() now returns a Transport pointer
+
 ### Fixed
 - Action properties are now properly assigned to transport
 - Parameter schema changed types for "items", "max" and "min"

@@ -89,8 +89,12 @@ func (r *Response) GetReturn() (interface{}, error) {
 }
 
 // GetTransport returns the transport.
-func (r *Response) GetTransport() Transport {
-	return Transport{r.command.Command.Arguments.Transport}
+func (r *Response) GetTransport() *Transport {
+	if r.command.Command.Arguments.Transport != nil {
+		return &Transport{r.command.Command.Arguments.Transport}
+	}
+
+	return nil
 }
 
 func newHTTPResponse(p *payload.HTTPResponse) *HTTPResponse {
