@@ -12,10 +12,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/datatypes"
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/json"
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/semver"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/datatypes"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/json"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/semver"
 )
 
 // ExecutionTimeout defines the number of milliseconds to wait by default when an action is executed.

@@ -18,7 +18,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/payload"
 )
 
 var ErrFileNotExist = errors.New("File doesn't exist")

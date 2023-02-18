@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/msgpack"
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/msgpack"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/payload"
 )
 
 // Flags used in multipart responses.

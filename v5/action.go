@@ -14,8 +14,8 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/datatypes"
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/datatypes"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/payload"
 )
 
 // Default action return values by type

@@ -11,7 +11,7 @@ package datatypes
 import (
 	"reflect"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/payload"
 )
 
 // Null defines the KUSANAGI data type for null values.

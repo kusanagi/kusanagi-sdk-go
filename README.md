@@ -9,7 +9,7 @@ Go SDK for the KUSANAGI framework
 Requirements
 ------------
 
-* [KUSANAGI framework](http://kusanagi.io) 4.0+
+* [KUSANAGI framework](http://kusanagi.io) 5.0+
 * [Go](https://golang.org/dl/) 1.16+
 * [libzmq](http://zeromq.org/intro:get-the-software) 4.3.4+
 
@@ -19,7 +19,7 @@ Installation
 Install the SDK using the following command:
 
 ```
-$ go get github.com/kusanagi/kusanagi-sdk-go/v4@epoch-4
+$ go get github.com/kusanagi/kusanagi-sdk-go/v5@epoch-5
 ```
 
 Getting Started

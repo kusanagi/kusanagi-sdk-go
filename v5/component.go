@@ -11,8 +11,8 @@ package kusanagi
 import (
 	"fmt"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/cli"
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/log"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/cli"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/log"
 )
 
 func init() {

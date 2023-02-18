@@ -11,7 +11,7 @@ package kusanagi
 import (
 	"fmt"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/payload"
 )
 
 // Transport encapsulates the transport object.

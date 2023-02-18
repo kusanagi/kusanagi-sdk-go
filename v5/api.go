@@ -12,9 +12,9 @@ import (
 	"errors"
 	"path"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/cli"
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/log"
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/payload"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/cli"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/log"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/payload"
 )
 
 func newApi(c Component, s *state) *Api {

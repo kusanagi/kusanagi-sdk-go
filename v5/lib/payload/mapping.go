@@ -11,7 +11,7 @@ package payload
 import (
 	"fmt"
 
-	"github.com/kusanagi/kusanagi-sdk-go/v4/lib/semver"
+	"github.com/kusanagi/kusanagi-sdk-go/v5/lib/semver"
 )
 
 // Mapping contains the schemas for the different services.
